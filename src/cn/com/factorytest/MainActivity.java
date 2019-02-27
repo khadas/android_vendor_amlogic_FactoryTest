@@ -159,9 +159,10 @@ public class MainActivity extends Activity {
 	private BTDeviceReceiver mBTDeviceReceiver;
 	private int CONFIG_BT_RSSI = -100;
 	private boolean BT_ERR =true;
-	private int BT_try_count = 2;
+	private int BT_try_count = 1;
 	private int btLevel = 0;
 	private final String BTSSID="Khadas";
+	private BTAdmin localBTAdmin;
 
     
     
@@ -263,8 +264,8 @@ public class MainActivity extends Activity {
     public void test_Thread() {
         test_volumes();
         test_ETH();
-		test_rtc();
-        test_BT();  
+	test_rtc();
+        test_BT(true);
         boolean bWifiOk = false;
 
             for (int i = 0; i < 10; i++) {
@@ -320,7 +321,7 @@ private class BTDeviceReceiver extends BroadcastReceiver{
 
 				  BT_try_count--;
 				  if(BT_try_count>0) {
-				  test_BT();
+				  test_BT(false);
 				  }
 				  if(BT_try_count<=0){
                   mHandler.sendEmptyMessage(MSG_BT_TEST_ERROR);
@@ -490,17 +491,17 @@ private void updateEthandWifi(){
 
   }
 
-   private void test_BT(){
+   private void test_BT(boolean delay){
          
-      try {
-		  Thread.sleep(1000);
-	  }catch(Exception localException1){
-
-	  }
-
-	  BTAdmin localBTAdmin = new BTAdmin();
+	  localBTAdmin = new BTAdmin();
 	  registerBTReceiver();
 	  localBTAdmin.OpenBT();
+	  if (delay) {
+		try {
+		  Thread.sleep(3000);
+		}catch(Exception localException1){
+		}
+	 }
 	  if(!localBTAdmin.ScanBT()){
        mHandler.sendEmptyMessage(MSG_BT_TEST_ERROR);
 	  }
@@ -828,6 +829,7 @@ private void updateEthandWifi(){
 					 m_TextView_BT.setText(strTxt);
 					 m_TextView_BT.setTextColor(0xFF55FF55);
 				}
+					 localBTAdmin.CloseBT();
 					 break;
                 case MSG_BT_TEST_ERROR:
 				{
@@ -835,6 +837,7 @@ private void updateEthandWifi(){
 					m_TextView_BT.setText(strTxt);
 					m_TextView_BT.setTextColor(0xFFFF5555);
 				}
+				localBTAdmin.CloseBT();
 				break;
 				case MSG_RTC_TEST_OK:
 				{
