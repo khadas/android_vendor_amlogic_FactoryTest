@@ -512,15 +512,15 @@ private void updateEthandWifi(){
     {
 
         boolean bWifiScaned = false;
+                configSSID =  getResources().getString(R.string.config_ap_ssid);
+                WifiAdmin  localWifiAdmin  =  new WifiAdmin (this);
+                localWifiAdmin.openWifi();
                 try {
-                    Thread.sleep(2000);
+                    Thread.sleep(3000);
                 }
                 catch(Exception localException1)
                 {
                 }
-                configSSID =  getResources().getString(R.string.config_ap_ssid);
-                WifiAdmin  localWifiAdmin  =  new WifiAdmin (this);
-                localWifiAdmin.openWifi();
                 localWifiAdmin.startScan();
                 wifiList = new ArrayList<ScanResult>();
                 
