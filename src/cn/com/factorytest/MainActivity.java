@@ -967,7 +967,7 @@ private void updateEthandWifi(){
 					 break;
                 case MSG_BT_TEST_ERROR:
 				{
-					String strTxt = getResources().getString(R.string.BT_Test) + getResources().getString(R.string.Test_Fail);
+					String strTxt = getResources().getString(R.string.BT_Test) + "    " + getResources().getString(R.string.Test_Fail);
 					m_TextView_BT.setText(strTxt);
 					m_TextView_BT.setTextColor(0xFFFF5555);
 				}
