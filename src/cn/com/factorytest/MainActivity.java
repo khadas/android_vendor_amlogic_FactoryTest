@@ -204,6 +204,10 @@ public class MainActivity extends Activity {
 
         m_TextView_Gsensor = (TextView)findViewById(R.id.TextView_Gsensor);
         m_TextView_Gyro = (TextView)findViewById(R.id.TextView_Gyro);
+        if (Tools.GetBoardType() == Tools.KHADAS_EDGE) {
+            m_TextView_Gsensor.setVisibility(View.GONE);
+            m_TextView_Gyro.setVisibility(View.GONE);
+        }
         m_TextView_Lan = (TextView)findViewById(R.id.TextView_Lan);
         m_TextView_Wifi = (TextView)findViewById(R.id.TextView_Wifi);
 		m_TextView_BT = (TextView)findViewById(R.id.TextView_BT);
