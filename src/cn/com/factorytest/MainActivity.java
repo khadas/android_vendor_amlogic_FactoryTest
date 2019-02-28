@@ -79,6 +79,7 @@ public class MainActivity extends Activity {
     TextView m_TextView_USB1;
     TextView m_TextView_USB2;
 
+    TextView m_TextView_Gesture;
     TextView m_TextView_Gsensor;
     TextView m_TextView_Gyro;
     TextView m_TextView_Lan;
@@ -128,6 +129,8 @@ public class MainActivity extends Activity {
 	private final int MSG_GSENSOR_TEST_ERROR =  105;
 	private final int MSG_GYRO_TEST_OK =  106;
 	private final int MSG_GYRO_TEST_ERROR =  107;
+	private final int MSG_GESTURE_TEST_OK =  108;
+	private final int MSG_GESTURE_TEST_ERROR =  109;
     private final int MSG_TIME = 777;
     private static final String nullip = "0.0.0.0";
     private static final String USB_PATH = (Tools.isAndroid5_1_1()?"/storage/udisk":"/storage/external_storage/sd");
@@ -204,9 +207,11 @@ public class MainActivity extends Activity {
 
         m_TextView_Gsensor = (TextView)findViewById(R.id.TextView_Gsensor);
         m_TextView_Gyro = (TextView)findViewById(R.id.TextView_Gyro);
-        if (Tools.GetBoardType() == Tools.KHADAS_EDGE) {
+        m_TextView_Gesture = (TextView)findViewById(R.id.TextView_Gesture);
+        if (Tools.getBoardType() == Tools.KHADAS_EDGE) {
             m_TextView_Gsensor.setVisibility(View.GONE);
             m_TextView_Gyro.setVisibility(View.GONE);
+            m_TextView_Gesture.setVisibility(View.GONE);
         }
         m_TextView_Lan = (TextView)findViewById(R.id.TextView_Lan);
         m_TextView_Wifi = (TextView)findViewById(R.id.TextView_Wifi);
@@ -276,6 +281,7 @@ public class MainActivity extends Activity {
     public void test_Thread() {
         test_Gsensor();
         test_Gyro();
+        test_Gesture();
         test_volumes();
         test_ETH();
 	test_rtc();
@@ -568,6 +574,14 @@ private void updateEthandWifi(){
            }
         }
         mHandler.sendEmptyMessage(MSG_GYRO_TEST_ERROR);
+   }
+
+   private void test_Gesture() {
+        File file = new File("/dev/iio:device0");
+        if (file.exists())
+            mHandler.sendEmptyMessage(MSG_GESTURE_TEST_OK);
+        else
+            mHandler.sendEmptyMessage(MSG_GESTURE_TEST_ERROR);
    }
 	
     private boolean test_Wifi()
@@ -909,6 +923,25 @@ private void updateEthandWifi(){
                 }
                 break;
 
+                case  MSG_GESTURE_TEST_OK:
+                {
+                    String strTxt = getResources().getString(R.string.Gesture_Test) + "    " + getResources().getString(R.string.Test_Ok);
+
+                    m_TextView_Gesture.setText(strTxt);
+                    m_TextView_Gesture.setTextColor(0xFF55FF55);
+					Log.d(TAG,"MSG_GESTURE_TEST_OK");
+                }
+                break;
+
+                case  MSG_GESTURE_TEST_ERROR:
+                {
+                    String strTxt = getResources().getString(R.string.Gesture_Test) + "    " + getResources().getString(R.string.Test_Fail);
+
+                    m_TextView_Gesture.setText(strTxt);
+                    m_TextView_Gesture.setTextColor(0xFFFF5555);
+					Log.d(TAG,"MSG_GESTURE_TEST_ERROR");
+                }
+                break;
                 case MSG_WIFI_TEST_OK:
                 {
                     String strTxt = getResources().getString(R.string.Wifi_Test) + "    " + configSSID + "    " + wifiLevel + "    " + getResources().getString(R.string.Test_Ok);
