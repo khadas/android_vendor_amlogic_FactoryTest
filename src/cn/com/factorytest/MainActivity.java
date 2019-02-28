@@ -162,7 +162,7 @@ public class MainActivity extends Activity {
     //系统灯和网络灯测试时间 单位s
     int ledtime = 60;
 	//videoview 全屏播放时间
-    private final long  MSG_PLAY_VIDEO_TIME= 60 * 1000;
+    private final long  MSG_PLAY_VIDEO_TIME= 30 * 60 * 1000;
 
     private Context mContext;
 	private BTDeviceReceiver mBTDeviceReceiver;
