@@ -79,6 +79,8 @@ public class MainActivity extends Activity {
     TextView m_TextView_USB1;
     TextView m_TextView_USB2;
 
+    TextView m_TextView_Gsensor;
+    TextView m_TextView_Gyro;
     TextView m_TextView_Lan;
     TextView m_TextView_Wifi;
 	TextView m_TextView_BT;
@@ -122,6 +124,10 @@ public class MainActivity extends Activity {
 	private final int MSG_RTC_TEST_ERROR = 101;
 	private final int MSG_BT_TEST_ERROR =  102;
 	private final int MSG_BT_TEST_OK =  103;
+	private final int MSG_GSENSOR_TEST_OK =  104;
+	private final int MSG_GSENSOR_TEST_ERROR =  105;
+	private final int MSG_GYRO_TEST_OK =  106;
+	private final int MSG_GYRO_TEST_ERROR =  107;
     private final int MSG_TIME = 777;
     private static final String nullip = "0.0.0.0";
     private static final String USB_PATH = (Tools.isAndroid5_1_1()?"/storage/udisk":"/storage/external_storage/sd");
@@ -196,6 +202,8 @@ public class MainActivity extends Activity {
         m_TextView_USB1 = (TextView)findViewById(R.id.TextView_USB1);
         m_TextView_USB2 = (TextView)findViewById(R.id.TextView_USB2);
 
+        m_TextView_Gsensor = (TextView)findViewById(R.id.TextView_Gsensor);
+        m_TextView_Gyro = (TextView)findViewById(R.id.TextView_Gyro);
         m_TextView_Lan = (TextView)findViewById(R.id.TextView_Lan);
         m_TextView_Wifi = (TextView)findViewById(R.id.TextView_Wifi);
 		m_TextView_BT = (TextView)findViewById(R.id.TextView_BT);
@@ -262,6 +270,8 @@ public class MainActivity extends Activity {
     }
  
     public void test_Thread() {
+        test_Gsensor();
+        test_Gyro();
         test_volumes();
         test_ETH();
 	test_rtc();
@@ -507,6 +517,54 @@ private void updateEthandWifi(){
 	  }
    }
     
+ 
+   private List<File> get_input_list(String path) {
+        int fileNum = 0;
+	File file = new File(path);
+        List<File> list = new ArrayList<File>();
+        if (file.exists()) {
+           File[] files = file.listFiles();
+           for (File file2 : files) {
+              String name = file2.getName().substring(0,5);;
+              Log.d(TAG, "get name="+name);
+              if (name.equals("input")) 
+              list.add(file2);
+           }
+        }  
+        return list;
+   }
+
+   private void test_Gsensor() {
+        List<File> list = get_input_list("/sys/class/input");
+        if (list != null) {
+           int size = list.size();
+           for (int i = 0; i< size; i++) {
+               String file = list.get(i).getAbsolutePath()+"/name";
+               String name = Tools.readFile(file);
+               if (name.equals("gsensor")) {
+                   mHandler.sendEmptyMessage(MSG_GSENSOR_TEST_OK);
+                   return;
+               }
+           }
+        }
+        mHandler.sendEmptyMessage(MSG_GSENSOR_TEST_ERROR);
+   }
+
+   private void test_Gyro() {
+        List<File> list = get_input_list("/sys/class/input");
+        if (list != null) {
+           int size = list.size();
+           for (int i = 0; i< size; i++) {
+               String file = list.get(i).getAbsolutePath()+"/name";
+               String name = Tools.readFile(file);
+               if (name.equals("gyro")) {
+                   mHandler.sendEmptyMessage(MSG_GYRO_TEST_OK);
+                   return;
+               }
+           }
+        }
+        mHandler.sendEmptyMessage(MSG_GYRO_TEST_ERROR);
+   }
 	
     private boolean test_Wifi()
     {
@@ -805,6 +863,45 @@ private void updateEthandWifi(){
                     m_TextView_Lan.setText(strTxt);
                     m_TextView_Lan.setTextColor(0xFFFF5555);
 					Log.d(TAG,"MSG_LAN_TEST_ERROR");
+                }
+                break;
+
+                case  MSG_GSENSOR_TEST_OK:
+                {
+                    String strTxt = getResources().getString(R.string.Gsensor_Test) + "    " + getResources().getString(R.string.Test_Ok);
+
+                    m_TextView_Gsensor.setText(strTxt);
+                    m_TextView_Gsensor.setTextColor(0xFF55FF55);
+					Log.d(TAG,"MSG_GSENSOR_TEST_OK");
+                }
+                break;
+
+                case  MSG_GSENSOR_TEST_ERROR:
+                {
+                    String strTxt = getResources().getString(R.string.Gsensor_Test) + "    " + getResources().getString(R.string.Test_Fail);
+
+                    m_TextView_Gsensor.setText(strTxt);
+                    m_TextView_Gsensor.setTextColor(0xFFFF5555);
+					Log.d(TAG,"MSG_GSENSOR_TEST_ERROR");
+                }
+                break;
+                case  MSG_GYRO_TEST_OK:
+                {
+                    String strTxt = getResources().getString(R.string.Gyro_Test) + "    " + getResources().getString(R.string.Test_Ok);
+
+                    m_TextView_Gyro.setText(strTxt);
+                    m_TextView_Gyro.setTextColor(0xFF55FF55);
+					Log.d(TAG,"MSG_GYRO_TEST_OK");
+                }
+                break;
+
+                case  MSG_GYRO_TEST_ERROR:
+                {
+                    String strTxt = getResources().getString(R.string.Gyro_Test) + "    " + getResources().getString(R.string.Test_Fail);
+
+                    m_TextView_Gyro.setText(strTxt);
+                    m_TextView_Gyro.setTextColor(0xFFFF5555);
+					Log.d(TAG,"MSG_GYRO_TEST_ERROR");
                 }
                 break;
 

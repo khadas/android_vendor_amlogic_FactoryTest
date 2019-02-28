@@ -92,6 +92,24 @@
         </TextView>
 	
         <TextView
+            android:id="@+id/TextView_Gsensor"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:textColor="#FF5555FF"
+            android:text="@string/Gsensor_Test"
+            android:textSize="25sp" >
+        </TextView>
+        <TextView
+            android:id="@+id/TextView_Gyro"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:textColor="#FF5555FF"
+            android:text="@string/Gyro_Test"
+            android:textSize="25sp" >
+        </TextView>
+        <TextView
             android:id="@+id/TextView_Rtc"
             android:layout_weight="1"
             android:layout_width="match_parent"
