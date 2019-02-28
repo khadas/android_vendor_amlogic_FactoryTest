@@ -51,6 +51,10 @@ public class Tools {
     public static final String Key_Deviceid = "deviceid";
     public static final String Key_Result = "result";
     public static final String Key_Sn = "sn";
+    public static final int KHADAS_UNKNOW = 0;
+    public static final int KHADAS_EDGE = 1;
+    public static final int KHADAS_EDGEV = 2;
+    public static final int KHADAS_CAPTAIN = 3;
 
     //public static  final String Ethernet_Led = "/proc/ledlight/netled/state";
     public static  final String Power_Led = "/proc/ledlight/powerled/state";
@@ -109,6 +113,21 @@ public class Tools {
 		{
 			Log.e(TAG, e.toString() );
 		}
+    }
+
+    public static int getBoardType()
+    {
+        int type = KHADAS_UNKNOW;
+	String str = readFile("/sys/class/board/type");
+        if (str.equals("1"))
+            type = KHADAS_EDGE;
+        else if (str.equals("2"))
+            type = KHADAS_EDGEV;
+        else if (str.equals("3"))
+            type = KHADAS_EDGE;
+        else
+            type = KHADAS_UNKNOW;
+        return type;
     }
 
     public static boolean isEthUp()
