@@ -146,7 +146,17 @@
             android:textSize="25sp" >
         </EditText>
 		
+        <TextView
+            android:id="@+id/TextView_Led"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:textColor="#FF5555FF"
+            android:text="@string/Led_Test"
+            android:textSize="25sp" >
+        </TextView>
+
         <Button
+            android:visibility="gone"
             android:onClick="NetLed_Test"
             android:id="@+id/Button_NetLed"
             android:layout_width="wrap_content"

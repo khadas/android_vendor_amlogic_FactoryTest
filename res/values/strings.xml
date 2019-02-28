@@ -30,7 +30,7 @@
 	 <string name="BT_Test">BT</string>
 	<string name="Rtc_Test">Rtc</string>
     <string name="Hdmi_Test">Hdmi</string>
-    <string name="Led_Test">Led 测试</string>
+    <string name="Led_Test">白灯是否闪烁?</string>
     <string name="Led_TestIng">Led 测试中</string>
     <string name="PowerKey_Test">Power Key Test</string>
     <string name="PowerKey_TestIng">Power Key Testing</string>
