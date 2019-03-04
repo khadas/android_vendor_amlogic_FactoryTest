@@ -495,20 +495,12 @@ private void updateEthandWifi(){
 
 	public void EnableWol(View view){
 		Log.e(TAG, "EnableWol");
-		try {
-			Process proc = Runtime.getRuntime().exec(new String[]{"su","-c","i2cset -f -y 2 0x18 0x21 0x1"});
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		Tools.writeFile("/sys/class/wol/enable", "1");
 	}
 
 	public void DisableWol(View view){
 		Log.e(TAG, "DisableWol");
-		try {
-			Process proc = Runtime.getRuntime().exec(new String[]{"su","-c","i2cset -f -y 2 0x18 0x21 0x0"});
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		Tools.writeFile("/sys/class/wol/enable", "0");
 	}
 
    public void KeyTest(View view){
@@ -1336,7 +1328,7 @@ private void updateEthandWifi(){
         mBottomLayout3.setVisibility(View.VISIBLE);
         mBottomLayout4.setVisibility(View.VISIBLE);
         mBottomLayout5.setVisibility(View.VISIBLE);
-		if (Build.MODEL.equals("VIM2") || Build.MODEL.equals("VIM2L")) {
+		if (Tools.getBoardType() != Tools.KHADAS_EDGE) {
 			if (keyCode == KeyEvent.KEYCODE_MENU) {
 				m_Button_EnableWol.setVisibility(View.VISIBLE);
 				m_Button_DisableWol.setVisibility(View.VISIBLE);
