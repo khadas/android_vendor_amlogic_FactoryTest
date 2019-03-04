@@ -21,6 +21,7 @@
     <string name="Gsensor_Test">Gsensor</string>
     <string name="Gyro_Test">Gyro</string>
     <string name="Gesture_Test">Gesture</string>
+    <string name="Pcie_Test">SATA硬盘</string>
     <string name="Test_Fail">Fail</string>
     <string name="Test_Ok">Pass</string>
     <string name="btnCvbsVideo">CVBS Video</string>

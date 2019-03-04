@@ -79,6 +79,7 @@ public class MainActivity extends Activity {
     TextView m_TextView_USB1;
     TextView m_TextView_USB2;
 
+    TextView m_TextView_Pcie;
     TextView m_TextView_Gesture;
     TextView m_TextView_Gsensor;
     TextView m_TextView_Gyro;
@@ -131,6 +132,8 @@ public class MainActivity extends Activity {
 	private final int MSG_GYRO_TEST_ERROR =  107;
 	private final int MSG_GESTURE_TEST_OK =  108;
 	private final int MSG_GESTURE_TEST_ERROR =  109;
+	private final int MSG_PCIE_TEST_OK =  110;
+	private final int MSG_PCIE_TEST_ERROR =  111;
     private final int MSG_TIME = 777;
     private static final String nullip = "0.0.0.0";
     private static final String USB_PATH = (Tools.isAndroid5_1_1()?"/storage/udisk":"/storage/external_storage/sd");
@@ -208,10 +211,12 @@ public class MainActivity extends Activity {
         m_TextView_Gsensor = (TextView)findViewById(R.id.TextView_Gsensor);
         m_TextView_Gyro = (TextView)findViewById(R.id.TextView_Gyro);
         m_TextView_Gesture = (TextView)findViewById(R.id.TextView_Gesture);
+        m_TextView_Pcie = (TextView)findViewById(R.id.TextView_Pcie);
         if (Tools.getBoardType() == Tools.KHADAS_EDGE) {
             m_TextView_Gsensor.setVisibility(View.GONE);
             m_TextView_Gyro.setVisibility(View.GONE);
             m_TextView_Gesture.setVisibility(View.GONE);
+            m_TextView_Pcie.setVisibility(View.GONE);
         }
         m_TextView_Lan = (TextView)findViewById(R.id.TextView_Lan);
         m_TextView_Wifi = (TextView)findViewById(R.id.TextView_Wifi);
@@ -282,6 +287,7 @@ public class MainActivity extends Activity {
         test_Gsensor();
         test_Gyro();
         test_Gesture();
+        test_Pcie();
         test_volumes();
         test_ETH();
 	test_rtc();
@@ -584,6 +590,14 @@ private void updateEthandWifi(){
             mHandler.sendEmptyMessage(MSG_GESTURE_TEST_ERROR);
    }
 	
+   private void test_Pcie() {
+        File file = new File("/dev/nvme0");
+        if (file.exists())
+            mHandler.sendEmptyMessage(MSG_PCIE_TEST_OK);
+        else
+            mHandler.sendEmptyMessage(MSG_PCIE_TEST_ERROR);
+   }
+
     private boolean test_Wifi()
     {
 
@@ -940,6 +954,25 @@ private void updateEthandWifi(){
                     m_TextView_Gesture.setText(strTxt);
                     m_TextView_Gesture.setTextColor(0xFFFF5555);
 					Log.d(TAG,"MSG_GESTURE_TEST_ERROR");
+                }
+                break;
+                case  MSG_PCIE_TEST_OK:
+                {
+                    String strTxt = getResources().getString(R.string.Pcie_Test) + "    " + getResources().getString(R.string.Test_Ok);
+
+                    m_TextView_Pcie.setText(strTxt);
+                    m_TextView_Pcie.setTextColor(0xFF55FF55);
+					Log.d(TAG,"MSG_PCIE_TEST_OK");
+                }
+                break;
+
+                case  MSG_PCIE_TEST_ERROR:
+                {
+                    String strTxt = getResources().getString(R.string.Pcie_Test) + "    " + getResources().getString(R.string.Test_Fail);
+
+                    m_TextView_Pcie.setText(strTxt);
+                    m_TextView_Pcie.setTextColor(0xFFFF5555);
+					Log.d(TAG,"MSG_PCIE_TEST_ERROR");
                 }
                 break;
                 case MSG_WIFI_TEST_OK:
