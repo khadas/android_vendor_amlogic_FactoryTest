@@ -40,9 +40,12 @@ public class FactoryReceiver extends BroadcastReceiver{
 				File rebootfile = new File(rebootfullpath);
 				if(rebootfile.exists() && rebootfile.isFile()){
 					try {
-					Thread.sleep(10000);
-					Process proc = Runtime.getRuntime().exec(new String[]{"reboot"});
-					proc.waitFor();
+						Thread.sleep(10000);
+						Intent intent1 = new Intent(Intent.ACTION_REBOOT);
+						intent1.putExtra("nowait", 1);
+						intent1.putExtra("interval", 1);
+						intent1.putExtra("window", 0);
+						context.sendBroadcast(intent1);
 					} catch (Exception e){
 						e.printStackTrace();
 					}
