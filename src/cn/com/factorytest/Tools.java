@@ -55,6 +55,9 @@ public class Tools {
     public static final int KHADAS_EDGE = 1;
     public static final int KHADAS_EDGEV = 2;
     public static final int KHADAS_CAPTAIN = 3;
+    public static final String KHADAS_EDGE_STR = "Edge";
+    public static final String KHADAS_EDGEV_STR = "EdgeV";
+    public static final String KHADAS_CAPTAIN_STR = "Captain";
 
     //public static  final String Ethernet_Led = "/proc/ledlight/netled/state";
     public static  final String Power_Led = "/proc/ledlight/powerled/state";
