@@ -16,6 +16,7 @@
     <string name="UsidAddr">Usid Address:</string>
     <string name="DeviceidAddr">Deviceid Address:</string>
     <string name="TF_Test">TF</string>
+    <string name="MCU_Test">MCU I2C</string>
     <string name="USB1_Test">USB2.0</string>
     <string name="USB2_Test">USB3.0</string>
     <string name="Gsensor_Test">Gsensor</string>

@@ -83,6 +83,7 @@ public class MainActivity extends Activity {
     TextView m_TextView_Gesture;
     TextView m_TextView_Gsensor;
     TextView m_TextView_Gyro;
+    TextView m_TextView_MCU;
     TextView m_TextView_Lan;
     TextView m_TextView_Wifi;
 	TextView m_TextView_BT;
@@ -134,6 +135,8 @@ public class MainActivity extends Activity {
 	private final int MSG_GESTURE_TEST_ERROR =  109;
 	private final int MSG_PCIE_TEST_OK =  110;
 	private final int MSG_PCIE_TEST_ERROR =  111;
+	private final int MSG_MCU_TEST_ERROR =  112;
+	private final int MSG_MCU_TEST_OK =  113;
     private final int MSG_TIME = 777;
     private static final String nullip = "0.0.0.0";
     private static final String USB_PATH = (Tools.isAndroid5_1_1()?"/storage/udisk":"/storage/external_storage/sd");
@@ -219,6 +222,7 @@ public class MainActivity extends Activity {
             m_TextView_Pcie.setVisibility(View.GONE);
         }
         m_TextView_Lan = (TextView)findViewById(R.id.TextView_Lan);
+        m_TextView_MCU = (TextView)findViewById(R.id.TextView_MCU);
         m_TextView_Wifi = (TextView)findViewById(R.id.TextView_Wifi);
 		m_TextView_BT = (TextView)findViewById(R.id.TextView_BT);
 		m_TextView_Rtc = (TextView)findViewById(R.id.TextView_Rtc);
@@ -288,6 +292,7 @@ public class MainActivity extends Activity {
         test_Gyro();
         test_Gesture();
         test_Pcie();
+        test_MCU();
         test_USB();
         test_volumes();
         test_ETH();
@@ -546,6 +551,14 @@ private void updateEthandWifi(){
             mHandler.sendEmptyMessage(MSG_USB2_TEST_ERROR);
   }
     
+  private void test_MCU() {
+
+        File file = new File("/sys/class/wol/enable");
+        if (file.exists())
+            mHandler.sendEmptyMessage(MSG_MCU_TEST_OK);
+        else
+            mHandler.sendEmptyMessage(MSG_MCU_TEST_ERROR);
+  }
  
    private List<File> get_input_list(String path) {
         int fileNum = 0;
@@ -859,6 +872,26 @@ private void updateEthandWifi(){
                     m_TextView_Lan.setText(strTxt);
                     m_TextView_Lan.setTextColor(0xFFFF5555);
 					Log.d(TAG,"MSG_LAN_TEST_ERROR");
+                }
+                break;
+
+                case  MSG_MCU_TEST_OK:
+                {
+                    String strTxt = getResources().getString(R.string.MCU_Test) + "    " + getResources().getString(R.string.Test_Ok);
+
+                    m_TextView_MCU.setText(strTxt);
+                    m_TextView_MCU.setTextColor(0xFF55FF55);
+					Log.d(TAG,"MSG_MCU_TEST_OK");
+                }
+                break;
+
+                case  MSG_MCU_TEST_ERROR:
+                {
+                    String strTxt = getResources().getString(R.string.MCU_Test) + "    " + getResources().getString(R.string.Test_Fail);
+
+                    m_TextView_MCU.setText(strTxt);
+                    m_TextView_MCU.setTextColor(0xFFFF5555);
+					Log.d(TAG,"MSG_MCU_TEST_ERROR");
                 }
                 break;
 
