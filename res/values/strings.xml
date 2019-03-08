@@ -23,8 +23,8 @@
     <string name="Gyro_Test">Gyro</string>
     <string name="Gesture_Test">Gesture</string>
     <string name="Pcie_Test">SSD</string>
-    <string name="Test_Fail">Fail</string>
-    <string name="Test_Ok">Pass</string>
+    <string name="Test_Fail">fail</string>
+    <string name="Test_Ok">pass</string>
     <string name="btnCvbsVideo">CVBS Video</string>
     <string name="Cvbs_Video">CVBS Video Test</string>
     <string name="Lan_Test">Lan</string>
