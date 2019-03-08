@@ -288,6 +288,7 @@ public class MainActivity extends Activity {
         test_Gyro();
         test_Gesture();
         test_Pcie();
+        test_USB();
         test_volumes();
         test_ETH();
 	test_rtc();
@@ -529,6 +530,21 @@ private void updateEthandWifi(){
        mHandler.sendEmptyMessage(MSG_BT_TEST_ERROR);
 	  }
    }
+
+  private void test_USB() {
+
+        File file1 = new File("/dev/usb/scsi_generic5-1:1.0");
+        if (file1.exists())
+            mHandler.sendEmptyMessage(MSG_USB1_TEST_OK);
+        else
+            mHandler.sendEmptyMessage(MSG_USB1_TEST_ERROR);
+
+        File file2 = new File("/dev/usb/scsi_generic4-1:1.0");
+        if (file2.exists())
+            mHandler.sendEmptyMessage(MSG_USB2_TEST_OK);
+        else
+            mHandler.sendEmptyMessage(MSG_USB2_TEST_ERROR);
+  }
     
  
    private List<File> get_input_list(String path) {
@@ -683,23 +699,6 @@ private void updateEthandWifi(){
 			mHandler.sendEmptyMessage(MSG_TF_TEST_XL_ERROR);
 		}
 		
-		{
-			mHandler.sendEmptyMessage(MSG_USB1_TEST_XL_ERROR);
-			mHandler.sendEmptyMessage(MSG_USB2_TEST_XL_ERROR);
-		}
-		
-		if(usbOrSd[1]){
-			mHandler.sendEmptyMessage(MSG_USB1_TEST_XL_OK);
-		}else{
-			mHandler.sendEmptyMessage(MSG_USB1_TEST_XL_ERROR);
-		}
-		
-		if(usbOrSd[2]){
-			mHandler.sendEmptyMessage(MSG_USB2_TEST_XL_OK);
-		}else{
-			mHandler.sendEmptyMessage(MSG_USB2_TEST_XL_ERROR);
-		}
-		
 	}
 	
 	
@@ -730,39 +729,7 @@ private void updateEthandWifi(){
             mHandler.sendEmptyMessage(MSG_TF_TEST_ERROR);
         }
         
-        {
-        	mHandler.sendEmptyMessage(MSG_USB1_TEST_ERROR);
-        	mHandler.sendEmptyMessage(MSG_USB2_TEST_ERROR);
-        }
-        if(bSda)
-        {
-        	if(isUsb1()) {
-        		mHandler.sendEmptyMessage(MSG_USB1_TEST_OK);
-        	}
-        	else {
-        		mHandler.sendEmptyMessage(MSG_USB2_TEST_OK);
-        	}
-        }
-
-        if(bSdb)
-        {   
-        	//判断两个U盘是否都接入
-        	if(bSda){
-        		mHandler.sendEmptyMessage(MSG_USB1_TEST_OK);
-            	mHandler.sendEmptyMessage(MSG_USB2_TEST_OK);
-        	}//只有一个U盘情况下 判断在哪个口
-        	else {
-            	if(isUsb1()) {
-            		mHandler.sendEmptyMessage(MSG_USB1_TEST_OK);
-            	}
-            	else {
-            		mHandler.sendEmptyMessage(MSG_USB2_TEST_OK);
-            	}
-        	} 
-        }
     }
-
-
     private List<String> getVolumes(){
         List<String> volumes = new ArrayList<String>();
         try{
@@ -1241,29 +1208,14 @@ private void updateEthandWifi(){
             	if(action.equals(Intent.ACTION_MEDIA_MOUNTED)){
             		String path = uri.getPath();
             		Log.d(TAG,"mFactoryReceiver mount patch is "+path);
-            		if(path.contains(USB1_PATH)){
-            			if(isUsb1()){
-            				mHandler.sendEmptyMessage(MSG_USB1_TEST_OK);
-            			}
-            			else {
-            				mHandler.sendEmptyMessage(MSG_USB2_TEST_OK);
-            			}
-            		}else if(path.contains(USB2_PATH)){
+                        if(path.contains(USB2_PATH)){
             			List<String> volumes = getVolumes();
             			boolean isUSB1MOUNT = false;
             	        for(String volume : volumes){
             	        	if(volume.contains(USB1_PATH)){
             	        		isUSB1MOUNT = true;
-            	            	mHandler.sendEmptyMessage(MSG_USB1_TEST_OK);
-            	            	mHandler.sendEmptyMessage(MSG_USB2_TEST_OK);
             	            }
             	        }
-            			if(!isUSB1MOUNT) {
-            				if(isUsb1())
-            					mHandler.sendEmptyMessage(MSG_USB1_TEST_OK);
-            				else
-            					mHandler.sendEmptyMessage(MSG_USB2_TEST_OK);
-            			}
             		}else if(path.contains(TFCARD_PATH)){
             			mHandler.sendEmptyMessage(MSG_TF_TEST_OK);
         		}            
