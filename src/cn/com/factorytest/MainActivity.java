@@ -396,12 +396,7 @@ private void updateEthandWifi(){
         m_ddr_size.setText((Tools.getmem_TOLAL()*100/1024/1024/100.0)+" GB");
         m_nand_size.setText(Tools.getRomSize(this));
         m_firmware_version.setText(Build.VERSION.INCREMENTAL);
-        if (Tools.getBoardType() == Tools.KHADAS_EDGE)
-           m_device_type.setText(Tools.KHADAS_EDGE_STR);
-        else if (Tools.getBoardType() == Tools.KHADAS_EDGEV)
-           m_device_type.setText(Tools.KHADAS_EDGEV_STR);
-        else if (Tools.getBoardType() == Tools.KHADAS_CAPTAIN)
-           m_device_type.setText(Tools.KHADAS_CAPTAIN_STR);
+        m_device_type.setText(Build.MODEL);
         
         updateEthandWifi();
         
