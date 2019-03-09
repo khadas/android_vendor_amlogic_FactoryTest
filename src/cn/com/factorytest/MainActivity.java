@@ -506,11 +506,13 @@ private void updateEthandWifi(){
 
 	public void EnableWol(View view){
 		Log.e(TAG, "EnableWol");
+		Tools.writeFile("/sys/class/wol/test", "1");
 		Tools.writeFile("/sys/class/wol/enable", "1");
 	}
 
 	public void DisableWol(View view){
 		Log.e(TAG, "DisableWol");
+                Tools.writeFile("/sys/class/wol/test", "0");
 		Tools.writeFile("/sys/class/wol/enable", "0");
 	}
 
