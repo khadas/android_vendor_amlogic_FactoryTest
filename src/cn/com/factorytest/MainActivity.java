@@ -215,11 +215,15 @@ public class MainActivity extends Activity {
         m_TextView_Gyro = (TextView)findViewById(R.id.TextView_Gyro);
         m_TextView_Gesture = (TextView)findViewById(R.id.TextView_Gesture);
         m_TextView_Pcie = (TextView)findViewById(R.id.TextView_Pcie);
+        m_Button_EnableWol = (Button)findViewById(R.id.EnableWol);
+        m_Button_DisableWol = (Button)findViewById(R.id.DisableWol);
         if (Tools.getBoardType() == Tools.KHADAS_EDGE) {
             m_TextView_Gsensor.setVisibility(View.GONE);
             m_TextView_Gyro.setVisibility(View.GONE);
             m_TextView_Gesture.setVisibility(View.GONE);
             m_TextView_Pcie.setVisibility(View.GONE);
+            m_Button_EnableWol.setVisibility(View.GONE);
+            m_Button_DisableWol.setVisibility(View.GONE);
         }
         m_TextView_Lan = (TextView)findViewById(R.id.TextView_Lan);
         m_TextView_MCU = (TextView)findViewById(R.id.TextView_MCU);
@@ -266,8 +270,6 @@ public class MainActivity extends Activity {
         m_Button_Key.setVisibility(View.GONE);
 		}
         
-        m_Button_EnableWol = (Button)findViewById(R.id.EnableWol);
-        m_Button_DisableWol = (Button)findViewById(R.id.DisableWol);
 
         mLeftLayout = (LinearLayout) findViewById(R.id.Layout_Left);
         mBottomLayout = (LinearLayout) findViewById(R.id.Layout_Bottom);
@@ -1315,13 +1317,6 @@ private void updateEthandWifi(){
         mBottomLayout3.setVisibility(View.VISIBLE);
         mBottomLayout4.setVisibility(View.VISIBLE);
         mBottomLayout5.setVisibility(View.VISIBLE);
-		if (Tools.getBoardType() != Tools.KHADAS_EDGE) {
-			if (keyCode == KeyEvent.KEYCODE_MENU) {
-				m_Button_EnableWol.setVisibility(View.VISIBLE);
-				m_Button_DisableWol.setVisibility(View.VISIBLE);
-				return true;
-			}
-		}
         return super.onKeyDown(keyCode, event);
     }
 
