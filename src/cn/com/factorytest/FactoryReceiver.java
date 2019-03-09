@@ -15,6 +15,7 @@ public class FactoryReceiver extends BroadcastReceiver{
 	//检测U盘 udiskfile 启动产测apk
 	private static final String udiskfile = "khadas_test.xml";
 	private static final String rebootfile = "khadas_reboot.xml";
+	private static final String rst_mcu_file = "khadas_rst_mcu.xml";
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		// TODO Auto-generated method stub
@@ -36,6 +37,12 @@ public class FactoryReceiver extends BroadcastReceiver{
             }
 
 			if (Intent.ACTION_MEDIA_MOUNTED.equals(action)) {
+				String rst_mcu_fullpath = path+"/"+rst_mcu_file;
+				File rstfile = new File(rst_mcu_fullpath);
+				if (rstfile.exists() && rstfile.isFile()) {
+					Tools.writeFile("/sys/class/wol/rst_mcu", "0");
+				}
+
 				String rebootfullpath = path+"/"+rebootfile;
 				File rebootfile = new File(rebootfullpath);
 				if(rebootfile.exists() && rebootfile.isFile()){
