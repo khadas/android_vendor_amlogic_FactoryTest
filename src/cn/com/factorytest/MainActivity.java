@@ -608,7 +608,7 @@ private void updateEthandWifi(){
    }
 
    private void test_Gesture() {
-        File file = new File("/dev/iio:device0");
+        File file = new File("/sys/kernel/debug/regmap/8-0039-apds9960_regmap");
         if (file.exists())
             mHandler.sendEmptyMessage(MSG_GESTURE_TEST_OK);
         else
