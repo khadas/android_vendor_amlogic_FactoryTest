@@ -84,6 +84,7 @@ public class MainActivity extends Activity {
     TextView m_TextView_Gsensor;
     TextView m_TextView_Gyro;
     TextView m_TextView_MCU;
+    TextView m_TextView_SPIFLASH;
     TextView m_TextView_Lan;
     TextView m_TextView_Wifi;
 	TextView m_TextView_BT;
@@ -137,6 +138,8 @@ public class MainActivity extends Activity {
 	private final int MSG_PCIE_TEST_ERROR =  111;
 	private final int MSG_MCU_TEST_ERROR =  112;
 	private final int MSG_MCU_TEST_OK =  113;
+	private final int MSG_SPIFLASH_TEST_ERROR =  114;
+	private final int MSG_SPIFLASH_TEST_OK =  115;
     private final int MSG_TIME = 777;
     private static final String nullip = "0.0.0.0";
     private static final String USB_PATH = (Tools.isAndroid5_1_1()?"/storage/udisk":"/storage/external_storage/sd");
@@ -165,9 +168,9 @@ public class MainActivity extends Activity {
     String readDeviceid = "";
     
     private boolean bIsKeyDown = false;
-    //ç³»ç»Ÿç¯å’Œç½‘ç»œç¯æµ‹è¯•æ—¶é—´ å•ä½s
+    //ÏµÍ³µÆºÍÍøÂçµÆ²âÊÔÊ±¼ä µ¥Î»s
     int ledtime = 60;
-	//videoview å…¨å±æ’­æ”¾æ—¶é—´
+	//videoview È«ÆÁ²¥·ÅÊ±¼ä
     private final long  MSG_PLAY_VIDEO_TIME= 30 * 60 * 1000;
 
     private Context mContext;
@@ -187,11 +190,11 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
 		mContext = this;
         mAudioManager = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);    
-        //æœ€å¤§éŸ³é‡    
+        //×î´óÒôÁ¿    
         maxVolume = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);    
-        //å½“å‰éŸ³é‡    
+        //µ±Ç°ÒôÁ¿    
         currentVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC); 
-        //è¿›å…¥äº§æµ‹apkè®¾ç½®æœ€å¤§éŸ³é‡
+        //½øÈë²ú²âapkÉèÖÃ×î´óÒôÁ¿
         mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, maxVolume, 0); 
         
         m_firmware_version = (TextView)findViewById(R.id.firmware_version_value);
@@ -227,6 +230,7 @@ public class MainActivity extends Activity {
         }
         m_TextView_Lan = (TextView)findViewById(R.id.TextView_Lan);
         m_TextView_MCU = (TextView)findViewById(R.id.TextView_MCU);
+        m_TextView_SPIFLASH = (TextView)findViewById(R.id.TextView_SPIFLASH);
         m_TextView_Wifi = (TextView)findViewById(R.id.TextView_Wifi);
 		m_TextView_BT = (TextView)findViewById(R.id.TextView_BT);
 		m_TextView_Rtc = (TextView)findViewById(R.id.TextView_Rtc);
@@ -295,6 +299,7 @@ public class MainActivity extends Activity {
         test_Gesture();
         test_Pcie();
         test_MCU();
+        test_SPIFLASH();
         test_USB();
         test_volumes();
         test_ETH();
@@ -458,7 +463,7 @@ private void updateEthandWifi(){
     @Override
 	protected void onDestroy() {
 		// TODO Auto-generated method stub
-    	//é€€å‡ºäº§æµ‹apkæ¢å¤ç³»ç»ŸéŸ³é‡å¤§å°
+    	//ÍË³ö²ú²âapk»Ö¸´ÏµÍ³ÒôÁ¿´óĞ¡
     	if(mAudioManager != null)
     	mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, currentVolume, 0); 
 		super.onDestroy();
@@ -558,7 +563,16 @@ private void updateEthandWifi(){
         else
             mHandler.sendEmptyMessage(MSG_MCU_TEST_ERROR);
   }
- 
+
+  private void test_SPIFLASH() {
+
+        File file = new File("/sys/class/w25q128fw/id");
+        if (file.exists())
+            mHandler.sendEmptyMessage(MSG_SPIFLASH_TEST_OK);
+        else
+            mHandler.sendEmptyMessage(MSG_SPIFLASH_TEST_ERROR);
+  }
+  
    private List<File> get_input_list(String path) {
         int fileNum = 0;
 	File file = new File(path);
@@ -679,7 +693,7 @@ private void updateEthandWifi(){
 
 	
 	/**
-	 * åˆ¤æ–­USBä¸F
+	 * ÅĞ¶ÏUSBÓëF
 	 */
 	private void test_volumes() {
 		
@@ -763,7 +777,7 @@ private void updateEthandWifi(){
         }
         return volumes;
     }
-    //ä»…ä»…åœ¨ä¸€ä¸ªUç›˜æ¥å…¥æƒ…å†µä¸‹åˆ¤æ–­æ¥å…¥é‚£ä¸ªUSBå£
+    //½ö½öÔÚÒ»¸öUÅÌ½ÓÈëÇé¿öÏÂÅĞ¶Ï½ÓÈëÄÇ¸öUSB¿Ú
     private boolean isUsb1(){
 		try {
 		   BufferedReader bufferReader = new BufferedReader(new InputStreamReader(Runtime.getRuntime().exec("lsusb").getInputStream()));
@@ -891,6 +905,26 @@ private void updateEthandWifi(){
                     m_TextView_MCU.setText(strTxt);
                     m_TextView_MCU.setTextColor(0xFFFF5555);
 					Log.d(TAG,"MSG_MCU_TEST_ERROR");
+                }
+                break;
+
+                case  MSG_SPIFLASH_TEST_OK:
+                {
+                    String strTxt = getResources().getString(R.string.SPIFLASH_Test) + "    " + getResources().getString(R.string.Test_Ok);
+
+                    m_TextView_SPIFLASH.setText(strTxt);
+                    m_TextView_SPIFLASH.setTextColor(0xFF55FF55);
+					Log.d(TAG,"MSG_SPIFLASH_TEST_OK");
+                }
+                break;
+
+                case  MSG_SPIFLASH_TEST_ERROR:
+                {
+                    String strTxt = getResources().getString(R.string.SPIFLASH_Test) + "    " + getResources().getString(R.string.Test_Fail);
+
+                    m_TextView_SPIFLASH.setText(strTxt);
+                    m_TextView_SPIFLASH.setTextColor(0xFFFF5555);
+					Log.d(TAG,"MSG_SPIFLASH_TEST_ERROR");
                 }
                 break;
 
