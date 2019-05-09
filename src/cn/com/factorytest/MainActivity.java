@@ -38,7 +38,11 @@ import android.text.format.Formatter;
 import android.Manifest;
 import android.content.pm.PackageManager;
 
-
+import java.io.FileReader;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -85,6 +89,7 @@ public class MainActivity extends Activity {
     TextView m_TextView_Gyro;
     TextView m_TextView_MCU;
     TextView m_TextView_SPIFLASH;
+	TextView m_TextView_Gigabit_network;
     TextView m_TextView_Lan;
     TextView m_TextView_Wifi;
 	TextView m_TextView_BT;
@@ -140,6 +145,8 @@ public class MainActivity extends Activity {
 	private final int MSG_MCU_TEST_OK =  113;
 	private final int MSG_SPIFLASH_TEST_ERROR =  114;
 	private final int MSG_SPIFLASH_TEST_OK =  115;
+	private final int MSG_Gigabit_network_TEST_ERROR =  116;
+	private final int MSG_Gigabit_network_TEST_OK =  117;	
     private final int MSG_TIME = 777;
     private static final String nullip = "0.0.0.0";
     private static final String USB_PATH = (Tools.isAndroid5_1_1()?"/storage/udisk":"/storage/external_storage/sd");
@@ -231,6 +238,7 @@ public class MainActivity extends Activity {
         m_TextView_Lan = (TextView)findViewById(R.id.TextView_Lan);
         m_TextView_MCU = (TextView)findViewById(R.id.TextView_MCU);
         m_TextView_SPIFLASH = (TextView)findViewById(R.id.TextView_SPIFLASH);
+        m_TextView_Gigabit_network = (TextView)findViewById(R.id.TextView_Gigabit_network);		
         m_TextView_Wifi = (TextView)findViewById(R.id.TextView_Wifi);
 		m_TextView_BT = (TextView)findViewById(R.id.TextView_BT);
 		m_TextView_Rtc = (TextView)findViewById(R.id.TextView_Rtc);
@@ -300,6 +308,7 @@ public class MainActivity extends Activity {
         test_Pcie();
         test_MCU();
         test_SPIFLASH();
+		test_Gigabit_network();
         test_USB();
         test_volumes();
         test_ETH();
@@ -572,7 +581,26 @@ private void updateEthandWifi(){
         else
             mHandler.sendEmptyMessage(MSG_SPIFLASH_TEST_ERROR);
   }
-  
+ 
+   private void test_Gigabit_network() {
+        String pathname = "/sys/class/net/eth0/speed";
+		try (FileReader reader = new FileReader(pathname);
+			 BufferedReader br = new BufferedReader(reader)) {
+			String line;
+			while ((line = br.readLine()) != null) {
+				int speed = Integer.parseInt(line);
+				Log.d(TAG, "net speed: " + speed);
+				if(1000==speed){
+					mHandler.sendEmptyMessage(MSG_Gigabit_network_TEST_OK);	
+					return;
+				}					
+			}		
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		mHandler.sendEmptyMessage(MSG_Gigabit_network_TEST_ERROR);	
+  }
+ 
    private List<File> get_input_list(String path) {
         int fileNum = 0;
 	File file = new File(path);
@@ -928,6 +956,26 @@ private void updateEthandWifi(){
                 }
                 break;
 
+                case  MSG_Gigabit_network_TEST_OK:
+                {
+                    String strTxt = getResources().getString(R.string.Gigabit_network_Test) + "    " + getResources().getString(R.string.Test_Ok);
+
+                    m_TextView_Gigabit_network.setText(strTxt);
+                    m_TextView_Gigabit_network.setTextColor(0xFF55FF55);
+					Log.d(TAG,"MSG_Gigabit_network_TEST_OK");
+                }
+                break;
+
+                case  MSG_Gigabit_network_TEST_ERROR:
+                {
+                    String strTxt = getResources().getString(R.string.Gigabit_network_Test) + "    " + getResources().getString(R.string.Test_Fail);
+
+                    m_TextView_Gigabit_network.setText(strTxt);
+                    m_TextView_Gigabit_network.setTextColor(0xFFFF5555);
+					Log.d(TAG,"MSG_Gigabit_network_TEST_ERROR");
+                }
+                break;
+				
                 case  MSG_GSENSOR_TEST_OK:
                 {
                     String strTxt = getResources().getString(R.string.Gsensor_Test) + "    " + getResources().getString(R.string.Test_Ok);

@@ -18,6 +18,7 @@
     <string name="TF_Test">TF</string>
     <string name="MCU_Test">MCU I2C</string>
     <string name="SPIFLASH_Test">SPIFLASH</string>	
+    <string name="Gigabit_network_Test">Gigabit_network</string>	    
     <string name="USB1_Test">USB2.0</string>
     <string name="USB2_Test">USB3.0</string>
     <string name="Gsensor_Test">Gsensor</string>
