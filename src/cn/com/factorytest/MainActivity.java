@@ -94,7 +94,7 @@ public class MainActivity extends Activity {
     TextView m_TextView_Wifi;
 	TextView m_TextView_BT;
 	TextView m_TextView_Rtc;
-    
+    TextView m_TextView_HDMI;
     Button m_Button_write_mac_usid;
     Button m_Button_NetLed;
     Button m_Button_PowerLed;
@@ -147,6 +147,8 @@ public class MainActivity extends Activity {
 	private final int MSG_SPIFLASH_TEST_OK =  115;
 	private final int MSG_Gigabit_network_TEST_ERROR =  116;
 	private final int MSG_Gigabit_network_TEST_OK =  117;	
+	private final int MSG_HDMI_TEST_ERROR =  118;
+	private final int MSG_HDMI_TEST_OK =  119;	
     private final int MSG_TIME = 777;
     private static final String nullip = "0.0.0.0";
     private static final String USB_PATH = (Tools.isAndroid5_1_1()?"/storage/udisk":"/storage/external_storage/sd");
@@ -238,7 +240,8 @@ public class MainActivity extends Activity {
         m_TextView_Lan = (TextView)findViewById(R.id.TextView_Lan);
         m_TextView_MCU = (TextView)findViewById(R.id.TextView_MCU);
         m_TextView_SPIFLASH = (TextView)findViewById(R.id.TextView_SPIFLASH);
-        m_TextView_Gigabit_network = (TextView)findViewById(R.id.TextView_Gigabit_network);		
+        m_TextView_Gigabit_network = (TextView)findViewById(R.id.TextView_Gigabit_network);	
+		m_TextView_HDMI = (TextView)findViewById(R.id.TextView_HDMI);	
         m_TextView_Wifi = (TextView)findViewById(R.id.TextView_Wifi);
 		m_TextView_BT = (TextView)findViewById(R.id.TextView_BT);
 		m_TextView_Rtc = (TextView)findViewById(R.id.TextView_Rtc);
@@ -309,6 +312,7 @@ public class MainActivity extends Activity {
         test_MCU();
         test_SPIFLASH();
 		test_Gigabit_network();
+		test_HDMI();
         test_USB();
         test_volumes();
         test_ETH();
@@ -551,17 +555,40 @@ private void updateEthandWifi(){
 
   private void test_USB() {
 
-        File file1 = new File("/dev/usb/scsi_generic5-1:1.0");
-        if (file1.exists())
-            mHandler.sendEmptyMessage(MSG_USB1_TEST_OK);
-        else
-            mHandler.sendEmptyMessage(MSG_USB1_TEST_ERROR);
-
-        File file2 = new File("/dev/usb/scsi_generic4-1:1.0");
-        if (file2.exists())
-            mHandler.sendEmptyMessage(MSG_USB2_TEST_OK);
-        else
-            mHandler.sendEmptyMessage(MSG_USB2_TEST_ERROR);
+        String pathname2 = "/sys/class/w25q128fw/usb2";
+		try (FileReader reader2 = new FileReader(pathname2);
+			 BufferedReader br2 = new BufferedReader(reader2)) {
+			String line2;
+			while ((line2 = br2.readLine()) != null) {
+				int usb2 = Integer.parseInt(line2);
+				Log.d(TAG, "hlm usb2: " + usb2);
+				if(1==usb2){
+					mHandler.sendEmptyMessage(MSG_USB1_TEST_OK);	
+				}	
+				else
+					mHandler.sendEmptyMessage(MSG_USB1_TEST_ERROR);	
+			}		
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		
+        String pathname3 = "/sys/class/w25q128fw/usb3";
+		try (FileReader reader3 = new FileReader(pathname3);
+			 BufferedReader br3 = new BufferedReader(reader3)) {
+			String line3;
+			while ((line3 = br3.readLine()) != null) {
+				int usb3 = Integer.parseInt(line3);
+				Log.d(TAG, "hlm usb3: " + usb3);
+				if(1==usb3){
+					mHandler.sendEmptyMessage(MSG_USB2_TEST_OK);	
+				}	
+				else
+					mHandler.sendEmptyMessage(MSG_USB2_TEST_ERROR);	
+			}		
+		} catch (IOException e) {
+			e.printStackTrace();
+		}				
   }
     
   private void test_MCU() {
@@ -575,11 +602,22 @@ private void updateEthandWifi(){
 
   private void test_SPIFLASH() {
 
-        File file = new File("/sys/class/w25q128fw/id");
-        if (file.exists())
-            mHandler.sendEmptyMessage(MSG_SPIFLASH_TEST_OK);
-        else
-            mHandler.sendEmptyMessage(MSG_SPIFLASH_TEST_ERROR);
+        String pathname = "/sys/class/w25q128fw/id";
+		try (FileReader reader = new FileReader(pathname);
+			 BufferedReader br = new BufferedReader(reader)) {
+			String line;
+			while ((line = br.readLine()) != null) {
+				int id = Integer.parseInt(line);
+				Log.d(TAG, "hlm w25q128fw: " + id);
+				if(1==id){
+					mHandler.sendEmptyMessage(MSG_SPIFLASH_TEST_OK);	
+					return;
+				}					
+			}		
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		mHandler.sendEmptyMessage(MSG_SPIFLASH_TEST_ERROR);			
   }
  
    private void test_Gigabit_network() {
@@ -589,7 +627,7 @@ private void updateEthandWifi(){
 			String line;
 			while ((line = br.readLine()) != null) {
 				int speed = Integer.parseInt(line);
-				Log.d(TAG, "net speed: " + speed);
+				Log.d(TAG, "hlm net speed: " + speed);
 				if(1000==speed){
 					mHandler.sendEmptyMessage(MSG_Gigabit_network_TEST_OK);	
 					return;
@@ -601,6 +639,24 @@ private void updateEthandWifi(){
 		mHandler.sendEmptyMessage(MSG_Gigabit_network_TEST_ERROR);	
   }
  
+   private void test_HDMI() {
+		
+        String pathname = "/sys/devices/platform/display-subsystem/drm/card0/card0-HDMI-A-1/edid";
+		try (FileReader reader = new FileReader(pathname);
+			 BufferedReader br = new BufferedReader(reader)) {
+			String line;
+			if ((line = br.readLine()) != null) {
+				Log.d(TAG, "hlm edid="+line);
+				mHandler.sendEmptyMessage(MSG_HDMI_TEST_OK);	
+				return;
+			}		
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		mHandler.sendEmptyMessage(MSG_HDMI_TEST_ERROR);			
+		
+  }
+  
    private List<File> get_input_list(String path) {
         int fileNum = 0;
 	File file = new File(path);
@@ -916,6 +972,25 @@ private void updateEthandWifi(){
                 }
                 break;
 
+                case  MSG_HDMI_TEST_OK:
+                {
+                    String strTxt = getResources().getString(R.string.HDMI_Test) + "    " + getResources().getString(R.string.Test_Ok);
+
+                    m_TextView_HDMI.setText(strTxt);
+                    m_TextView_HDMI.setTextColor(0xFF55FF55);
+					Log.d(TAG,"MSG_HDMI_TEST_OK");
+                }
+                break;
+
+                case  MSG_HDMI_TEST_ERROR:
+                {
+                    String strTxt = getResources().getString(R.string.HDMI_Test) + "    " + getResources().getString(R.string.Test_Fail);
+
+                    m_TextView_HDMI.setText(strTxt);
+                    m_TextView_HDMI.setTextColor(0xFFFF5555);
+					Log.d(TAG,"MSG_HDMI_TEST_ERROR");
+                }
+                break;
                 case  MSG_MCU_TEST_OK:
                 {
                     String strTxt = getResources().getString(R.string.MCU_Test) + "    " + getResources().getString(R.string.Test_Ok);
