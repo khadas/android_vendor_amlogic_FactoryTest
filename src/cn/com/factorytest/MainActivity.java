@@ -95,12 +95,15 @@ public class MainActivity extends Activity {
 	TextView m_TextView_BT;
 	TextView m_TextView_Rtc;
     TextView m_TextView_HDMI;
+	TextView m_TextView_PD12;
+	TextView m_TextView_Charge;
     Button m_Button_write_mac_usid;
     Button m_Button_NetLed;
     Button m_Button_PowerLed;
 	Button m_Button_Key;
 
     Button m_Button_EnableWol;
+	Button m_Button_Restore_MCU_settings;
     Button m_Button_DisableWol;
  
 
@@ -149,6 +152,12 @@ public class MainActivity extends Activity {
 	private final int MSG_Gigabit_network_TEST_OK =  117;	
 	private final int MSG_HDMI_TEST_ERROR =  118;
 	private final int MSG_HDMI_TEST_OK =  119;	
+	private final int MSG_PD12_TEST_ERROR =  120;
+	private final int MSG_PD12_TEST_OK =  121;	
+	private final int MSG_PD2_TEST_ERROR =  122;
+	private final int MSG_PD1_TEST_ERROR =  123;	
+	private final int MSG_Charge_TEST_ERROR =  124;
+	private final int MSG_Charge_TEST_OK =  125;				
     private final int MSG_TIME = 777;
     private static final String nullip = "0.0.0.0";
     private static final String USB_PATH = (Tools.isAndroid5_1_1()?"/storage/udisk":"/storage/external_storage/sd");
@@ -228,6 +237,7 @@ public class MainActivity extends Activity {
         m_TextView_Gesture = (TextView)findViewById(R.id.TextView_Gesture);
         m_TextView_Pcie = (TextView)findViewById(R.id.TextView_Pcie);
         m_Button_EnableWol = (Button)findViewById(R.id.EnableWol);
+		m_Button_Restore_MCU_settings = (Button)findViewById(R.id.Restore_MCU_settings);
         m_Button_DisableWol = (Button)findViewById(R.id.DisableWol);
         if (Tools.getBoardType() == Tools.KHADAS_EDGE) {
             m_TextView_Gsensor.setVisibility(View.GONE);
@@ -235,6 +245,7 @@ public class MainActivity extends Activity {
             m_TextView_Gesture.setVisibility(View.GONE);
             m_TextView_Pcie.setVisibility(View.GONE);
             m_Button_EnableWol.setVisibility(View.GONE);
+			m_Button_Restore_MCU_settings.setVisibility(View.GONE);
             m_Button_DisableWol.setVisibility(View.GONE);
         }
         m_TextView_Lan = (TextView)findViewById(R.id.TextView_Lan);
@@ -242,6 +253,8 @@ public class MainActivity extends Activity {
         m_TextView_SPIFLASH = (TextView)findViewById(R.id.TextView_SPIFLASH);
         m_TextView_Gigabit_network = (TextView)findViewById(R.id.TextView_Gigabit_network);	
 		m_TextView_HDMI = (TextView)findViewById(R.id.TextView_HDMI);	
+        m_TextView_PD12 = (TextView)findViewById(R.id.TextView_PD12);
+		m_TextView_Charge = (TextView)findViewById(R.id.TextView_Charge);			
         m_TextView_Wifi = (TextView)findViewById(R.id.TextView_Wifi);
 		m_TextView_BT = (TextView)findViewById(R.id.TextView_BT);
 		m_TextView_Rtc = (TextView)findViewById(R.id.TextView_Rtc);
@@ -313,6 +326,8 @@ public class MainActivity extends Activity {
         test_SPIFLASH();
 		test_Gigabit_network();
 		test_HDMI();
+        test_PD();
+        test_Charge();	
         test_USB();
         test_volumes();
         test_ETH();
@@ -525,6 +540,11 @@ private void updateEthandWifi(){
 		Tools.writeFile("/sys/class/wol/enable", "1");
 	}
 
+	public void Restore_MCU_settings(View view){
+		Log.e(TAG, "hlm Restore_MCU_settings");
+		Tools.writeFile("/sys/class/wol/rst_mcu", "0");
+	}
+	
 	public void DisableWol(View view){
 		Log.e(TAG, "DisableWol");
                 Tools.writeFile("/sys/class/wol/test", "0");
@@ -590,7 +610,54 @@ private void updateEthandWifi(){
 			e.printStackTrace();
 		}				
   }
-    
+
+    private void test_PD() {
+
+        String pathname2 = "/sys/class/w25q128fw/fusb302";
+		try (FileReader reader2 = new FileReader(pathname2);
+			 BufferedReader br2 = new BufferedReader(reader2)) {
+			String line2;
+			while ((line2 = br2.readLine()) != null) {
+				int usb2 = Integer.parseInt(line2);
+				Log.d(TAG, "hlm fusb302: " + usb2);
+				if(3 == usb2){
+					mHandler.sendEmptyMessage(MSG_PD12_TEST_OK);	
+				}
+				else if(2 == usb2){
+					mHandler.sendEmptyMessage(MSG_PD1_TEST_ERROR);	
+				}
+				else if(1 == usb2){
+					mHandler.sendEmptyMessage(MSG_PD2_TEST_ERROR);	
+				}
+				else{
+					mHandler.sendEmptyMessage(MSG_PD12_TEST_ERROR);	
+				}
+			}		
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+  }
+
+  private void test_Charge() {
+
+        String pathname = "/sys/class/w25q128fw/charge";
+		try (FileReader reader = new FileReader(pathname);
+			 BufferedReader br = new BufferedReader(reader)) {
+			String line;
+			while ((line = br.readLine()) != null) {
+				int id = Integer.parseInt(line);
+				Log.d(TAG, "hlm charge: " + id);
+				if(1==id){
+					mHandler.sendEmptyMessage(MSG_Charge_TEST_OK);	
+					return;
+				}					
+			}		
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		mHandler.sendEmptyMessage(MSG_Charge_TEST_ERROR);			
+  }
+  
   private void test_MCU() {
 
         File file = new File("/sys/class/wol/enable");
@@ -1050,7 +1117,66 @@ private void updateEthandWifi(){
 					Log.d(TAG,"MSG_Gigabit_network_TEST_ERROR");
                 }
                 break;
+
+                case  MSG_PD12_TEST_OK:
+                {
+                    String strTxt = getResources().getString(R.string.PD12_Test) + "    " + getResources().getString(R.string.Test_Ok);
+
+                    m_TextView_PD12.setText(strTxt);
+                    m_TextView_PD12.setTextColor(0xFF55FF55);
+					Log.d(TAG,"MSG_PD12_TEST_OK");
+                }
+                break;
+
+                case  MSG_PD12_TEST_ERROR:
+                {
+                    String strTxt = getResources().getString(R.string.PD12_Test) + "    " + getResources().getString(R.string.PD12_Test_Fail);
+
+                    m_TextView_PD12.setText(strTxt);
+                    m_TextView_PD12.setTextColor(0xFFFF5555);
+					Log.d(TAG,"MSG_PD12_TEST_ERROR");
+                }
+                break;
 				
+                case  MSG_PD1_TEST_ERROR:
+                {
+                    String strTxt = getResources().getString(R.string.PD12_Test) + "    " + getResources().getString(R.string.PD1_Test_Fail);
+
+                    m_TextView_PD12.setText(strTxt);
+                    m_TextView_PD12.setTextColor(0xFFFF5555);
+					Log.d(TAG,"MSG_PD1_TEST_ERROR");
+                }
+                break;
+
+                case  MSG_PD2_TEST_ERROR:
+                {
+                    String strTxt = getResources().getString(R.string.PD12_Test) + "    " + getResources().getString(R.string.PD2_Test_Fail);
+
+                    m_TextView_PD12.setText(strTxt);
+                    m_TextView_PD12.setTextColor(0xFFFF5555);
+					Log.d(TAG,"MSG_PD2_TEST_ERROR");
+                }
+                break;
+				
+                case  MSG_Charge_TEST_OK:
+                {
+                    String strTxt = getResources().getString(R.string.Charge_Test) + "    " + getResources().getString(R.string.Test_Ok);
+
+                    m_TextView_Charge.setText(strTxt);
+                    m_TextView_Charge.setTextColor(0xFF55FF55);
+					Log.d(TAG,"MSG_ChargeTEST_OK");
+                }
+                break;
+
+                case  MSG_Charge_TEST_ERROR:
+                {
+                    String strTxt = getResources().getString(R.string.Charge_Test) + "    " + getResources().getString(R.string.Test_Fail);
+
+                    m_TextView_Charge.setText(strTxt);
+                    m_TextView_Charge.setTextColor(0xFFFF5555);
+					Log.d(TAG,"MSG_Charge_TEST_ERROR");
+                }
+                break;												
                 case  MSG_GSENSOR_TEST_OK:
                 {
                     String strTxt = getResources().getString(R.string.Gsensor_Test) + "    " + getResources().getString(R.string.Test_Ok);
