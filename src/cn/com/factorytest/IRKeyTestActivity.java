@@ -10,36 +10,39 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import java.io.FileReader;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
 public class IRKeyTestActivity extends Activity {
 	
 	  private static HashMap<Integer, Integer> keyAndIds = new HashMap();
 	  private RelativeLayout layout;
 	  private HashMap<Integer, Button> mapView = new HashMap();
-	  private TextView text1;
-	  private TextView text2;
 
 	  static
 	  {
-	    keyAndIds.put(Integer.valueOf(KeyEvent.KEYCODE_DPAD_LEFT), Integer.valueOf(R.id.left));
-	    keyAndIds.put(Integer.valueOf(KeyEvent.KEYCODE_DPAD_DOWN), Integer.valueOf(R.id.down));
-	    keyAndIds.put(Integer.valueOf(KeyEvent.KEYCODE_DPAD_RIGHT), Integer.valueOf(R.id.right));
-	    keyAndIds.put(Integer.valueOf(KeyEvent.KEYCODE_DPAD_UP), Integer.valueOf(R.id.up));
-	    keyAndIds.put(Integer.valueOf(KeyEvent.KEYCODE_BACK), Integer.valueOf(R.id.back));
-	    keyAndIds.put(Integer.valueOf(KeyEvent.KEYCODE_VOLUME_UP), Integer.valueOf(R.id.va));
-	    keyAndIds.put(Integer.valueOf(KeyEvent.KEYCODE_VOLUME_DOWN), Integer.valueOf(R.id.vs));
-	    keyAndIds.put(Integer.valueOf(KeyEvent.KEYCODE_MENU), Integer.valueOf(R.id.menu));
-	    keyAndIds.put(Integer.valueOf(KeyEvent.KEYCODE_VOLUME_MUTE), Integer.valueOf(R.id.mute));
-	    keyAndIds.put(Integer.valueOf(KeyEvent.KEYCODE_0), Integer.valueOf(R.id.n0));
-	    keyAndIds.put(Integer.valueOf(KeyEvent.KEYCODE_1), Integer.valueOf(R.id.n1));
-	    keyAndIds.put(Integer.valueOf(KeyEvent.KEYCODE_2), Integer.valueOf(R.id.n2));
-	    keyAndIds.put(Integer.valueOf(KeyEvent.KEYCODE_3), Integer.valueOf(R.id.n3));
-	    keyAndIds.put(Integer.valueOf(KeyEvent.KEYCODE_4), Integer.valueOf(R.id.n4));
-	    keyAndIds.put(Integer.valueOf(KeyEvent.KEYCODE_5), Integer.valueOf(R.id.n5));
-	    keyAndIds.put(Integer.valueOf(KeyEvent.KEYCODE_6), Integer.valueOf(R.id.n6));
-	    keyAndIds.put(Integer.valueOf(KeyEvent.KEYCODE_7), Integer.valueOf(R.id.n7));
-	    keyAndIds.put(Integer.valueOf(KeyEvent.KEYCODE_8), Integer.valueOf(R.id.n8));
-	    keyAndIds.put(Integer.valueOf(KeyEvent.KEYCODE_9), Integer.valueOf(R.id.n9));
+	    keyAndIds.put(Integer.valueOf(KeyEvent.KEYCODE_DPAD_LEFT), Integer.valueOf(R.id.right));
+	    keyAndIds.put(Integer.valueOf(KeyEvent.KEYCODE_DPAD_DOWN), Integer.valueOf(R.id.up));
+	    keyAndIds.put(Integer.valueOf(KeyEvent.KEYCODE_DPAD_RIGHT), Integer.valueOf(R.id.left));
+	    keyAndIds.put(Integer.valueOf(KeyEvent.KEYCODE_DPAD_UP), Integer.valueOf(R.id.down));
+	    keyAndIds.put(Integer.valueOf(KeyEvent.KEYCODE_1), Integer.valueOf(R.id.button_a));
+	    keyAndIds.put(Integer.valueOf(KeyEvent.KEYCODE_2), Integer.valueOf(R.id.button_b));
+	    //keyAndIds.put(Integer.valueOf(KeyEvent.KEYCODE_BACK), Integer.valueOf(R.id.back));
+	    keyAndIds.put(Integer.valueOf(KeyEvent.KEYCODE_3), Integer.valueOf(R.id.button_x));
+	    keyAndIds.put(Integer.valueOf(KeyEvent.KEYCODE_4), Integer.valueOf(R.id.button_y));
+	    keyAndIds.put(Integer.valueOf(KeyEvent.KEYCODE_5), Integer.valueOf(R.id.va));
+	    keyAndIds.put(Integer.valueOf(KeyEvent.KEYCODE_6), Integer.valueOf(R.id.home));
+	    keyAndIds.put(Integer.valueOf(KeyEvent.KEYCODE_7), Integer.valueOf(R.id.vs));
 	  }
 
 	public Button getCodeView(int paramInt)
@@ -88,11 +91,20 @@ public class IRKeyTestActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
+        String pathname = "/sys/class/w25q128fw/key";
+		try (FileReader reader = new FileReader(pathname);
+			 BufferedReader br = new BufferedReader(reader)) {
+			String line;
+			while ((line = br.readLine()) != null) {
+				int id = Integer.parseInt(line);
+				log("  key id:" + id);
+			}		
+		} catch (IOException e) {
+			e.printStackTrace();
+		}		
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.keytest);
 	    this.layout = ((RelativeLayout)findViewById(R.id.layout));
-	    this.text1 = ((TextView)findViewById(R.id.text1));
-	    this.text2 = ((TextView)findViewById(R.id.text2));
 	}
 
 	  public boolean onKeyDown(int paramInt, KeyEvent paramKeyEvent)
@@ -106,7 +118,7 @@ public class IRKeyTestActivity extends Activity {
 
 	  public boolean onKeyUp(int paramInt, KeyEvent paramKeyEvent)
 	  {
-		if(paramInt == KeyEvent.KEYCODE_DPAD_CENTER)
+		if(paramInt == KeyEvent.KEYCODE_6)
 		{
 				 log(" ok is finish this keytest acivity");
 				 this.finish();

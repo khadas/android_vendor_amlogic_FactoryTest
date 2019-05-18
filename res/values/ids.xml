@@ -23,6 +23,7 @@
     <item type="id" name="mute">false</item>
     <item type="id" name="button_start">false</item>
     <item type="id" name="back">false</item>
+    <item type="id" name="home">false</item>
     <item type="id" name="action_settings">false</item>
     <item type="id" name="n0">false</item>
     <item type="id" name="n1">false</item>

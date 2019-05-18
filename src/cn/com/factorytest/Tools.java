@@ -127,7 +127,7 @@ public class Tools {
         else if (str.equals("2"))
             type = KHADAS_EDGEV;
         else if (str.equals("3"))
-            type = KHADAS_EDGE;
+            type = KHADAS_CAPTAIN;
         else
             type = KHADAS_UNKNOW;
         return type;

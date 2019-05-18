@@ -104,6 +104,7 @@ public class MainActivity extends Activity {
 
     Button m_Button_EnableWol;
 	Button m_Button_Restore_MCU_settings;
+	Button m_Button_speaker_MIC;
     Button m_Button_DisableWol;
  
 
@@ -238,16 +239,8 @@ public class MainActivity extends Activity {
         m_TextView_Pcie = (TextView)findViewById(R.id.TextView_Pcie);
         m_Button_EnableWol = (Button)findViewById(R.id.EnableWol);
 		m_Button_Restore_MCU_settings = (Button)findViewById(R.id.Restore_MCU_settings);
+		m_Button_speaker_MIC = (Button)findViewById(R.id.speaker_MIC);
         m_Button_DisableWol = (Button)findViewById(R.id.DisableWol);
-        if (Tools.getBoardType() == Tools.KHADAS_EDGE) {
-            m_TextView_Gsensor.setVisibility(View.GONE);
-            m_TextView_Gyro.setVisibility(View.GONE);
-            m_TextView_Gesture.setVisibility(View.GONE);
-            m_TextView_Pcie.setVisibility(View.GONE);
-            m_Button_EnableWol.setVisibility(View.GONE);
-			m_Button_Restore_MCU_settings.setVisibility(View.GONE);
-            m_Button_DisableWol.setVisibility(View.GONE);
-        }
         m_TextView_Lan = (TextView)findViewById(R.id.TextView_Lan);
         m_TextView_MCU = (TextView)findViewById(R.id.TextView_MCU);
         m_TextView_SPIFLASH = (TextView)findViewById(R.id.TextView_SPIFLASH);
@@ -258,6 +251,24 @@ public class MainActivity extends Activity {
         m_TextView_Wifi = (TextView)findViewById(R.id.TextView_Wifi);
 		m_TextView_BT = (TextView)findViewById(R.id.TextView_BT);
 		m_TextView_Rtc = (TextView)findViewById(R.id.TextView_Rtc);
+		Log.d(TAG, "hlm Tools.getBoardType(): " + Tools.getBoardType());
+        if (Tools.getBoardType() == Tools.KHADAS_EDGE) {
+            m_TextView_Gsensor.setVisibility(View.GONE);
+            m_TextView_Gyro.setVisibility(View.GONE);
+            m_TextView_Gesture.setVisibility(View.GONE);
+            m_TextView_Pcie.setVisibility(View.GONE);
+            m_Button_EnableWol.setVisibility(View.GONE);
+			m_Button_Restore_MCU_settings.setVisibility(View.GONE);
+			m_Button_speaker_MIC.setVisibility(View.GONE);
+            m_Button_DisableWol.setVisibility(View.GONE);
+			m_TextView_TF.setVisibility(View.GONE);
+			m_TextView_Lan.setVisibility(View.GONE);
+			m_TextView_Gigabit_network.setVisibility(View.GONE);	
+			m_TextView_Charge.setVisibility(View.GONE);			
+        }	
+		if (Tools.getBoardType() == Tools.KHADAS_EDGEV) {	
+			m_Button_speaker_MIC.setVisibility(View.GONE);
+		}
 		if(DISABLED_RTC) {
 	    m_TextView_Rtc.setVisibility(View.GONE);
 		}
@@ -294,7 +305,7 @@ public class MainActivity extends Activity {
 		}
 
 		m_Button_Key = (Button)findViewById(R.id.KeyTest);
-		if(DISABLED_KEY) {
+		if(DISABLED_KEY && Tools.getBoardType() != Tools.KHADAS_CAPTAIN) {
         m_Button_Key.setVisibility(View.GONE);
 		}
         
@@ -544,7 +555,11 @@ private void updateEthandWifi(){
 		Log.e(TAG, "hlm Restore_MCU_settings");
 		Tools.writeFile("/sys/class/wol/rst_mcu", "0");
 	}
-	
+
+	public void speaker_MIC(View view){
+		Log.e(TAG, "hlm speaker_MIC");
+	}
+		
 	public void DisableWol(View view){
 		Log.e(TAG, "DisableWol");
                 Tools.writeFile("/sys/class/wol/test", "0");
@@ -552,9 +567,9 @@ private void updateEthandWifi(){
 	}
 
    public void KeyTest(View view){
-         Log.e(TAG, "KeyTest()");
-
-
+         Log.e(TAG, "hlm KeyTest()");
+		 Intent intent = new Intent(this, IRKeyTestActivity.class);
+		 startActivity(intent);
   }
 
    private void test_BT(boolean delay){
