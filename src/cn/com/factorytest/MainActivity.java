@@ -557,7 +557,9 @@ private void updateEthandWifi(){
 	}
 
 	public void speaker_MIC(View view){
-		Log.e(TAG, "hlm speaker_MIC");
+		Log.e(TAG, "hlm MIC");
+		Intent intent = new Intent(this, PhoneMicTestActivity.class);
+		startActivity(intent);
 	}
 		
 	public void DisableWol(View view){

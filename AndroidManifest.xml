@@ -14,7 +14,9 @@
 	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.WRITE_SECURE_SETTINGS"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-	
+	<uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />	
 
 	<uses-sdk
 		android:minSdkVersion="17"
@@ -41,6 +43,17 @@
             android:screenOrientation="landscape"
             android:label="@string/WriteMac" >
         </activity>
+        <activity
+            android:name=".PhoneMicTestActivity"
+            android:screenOrientation="landscape" >
+            <intent-filter>
+                <action
+                    android:name="android.intent.action.PhoneMicTestActivity"
+                    android:screenOrientation="landscape" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>		
               <receiver android:name=".FactoryReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.MEDIA_MOUNTED" />
