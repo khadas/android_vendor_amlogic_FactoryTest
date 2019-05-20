@@ -560,6 +560,9 @@ private void updateEthandWifi(){
 		Log.e(TAG, "hlm MIC");
 		Intent intent = new Intent(this, PhoneMicTestActivity.class);
 		startActivity(intent);
+		Log.e(TAG, "buzzer");
+        Tools.writeFile("/sys/class/w25q128fw/buzzer", "1");
+		
 	}
 		
 	public void DisableWol(View view){

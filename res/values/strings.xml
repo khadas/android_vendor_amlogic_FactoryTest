@@ -91,10 +91,10 @@
     <string name="KeyTest">按键测试</string>
 	<string name="EnableWol">打开WOL</string>
 	<string name="Restore_MCU_settings">恢复MCU设置</string>
-	<string name="speaker_MIC">MIC</string>		
+	<string name="speaker_MIC">蜂鸣器与麦克风</string>		
 	<string name="DisableWol">关闭WOL</string>
- 	<string name="PhoneMictTitle">麦克风测试</string>   
-	<string name="PhoneMicSubTitle">请对麦克风说点什么</string>
+ 	<string name="PhoneMictTitle">蜂鸣器与麦克风测试</string>   
+	<string name="PhoneMicSubTitle">蜂鸣器是否在响？请对麦克风说点什么</string>
 	<string name="btnRetest">再次测试</string>
 	<string name="btnSkipText">返回</string>
 	<string name="InsertSdCard">请插入SD卡！</string>

@@ -29,7 +29,7 @@ public class PhoneMicTestActivity extends Activity implements OnClickListener{
 			.getSimpleName();
 	
 	private final static String ERRMSG = "Record error";
-	private final static int RECORD_TIME = 5;
+	private final static int RECORD_TIME = 3;
 	private static final int MSG_TEST_MIC_ING = 8738;
 	private static final int MSG_TEST_MIC_OVER = 13107;
 	private static final int MSG_TEST_MIC_START = 4369;
@@ -113,6 +113,7 @@ public class PhoneMicTestActivity extends Activity implements OnClickListener{
 	protected void onPause() {
 
 		super.onPause();
+		Tools.writeFile("/sys/class/w25q128fw/buzzer", "0");
 
 		if (this.isSDcardTestOk) {
 
@@ -174,6 +175,7 @@ public class PhoneMicTestActivity extends Activity implements OnClickListener{
 			switch (msg.what) {
 			default:
 			case MSG_TEST_MIC_START:
+				Tools.writeFile("/sys/class/w25q128fw/buzzer", "1");
 
 				removeMessages(MSG_TEST_MIC_START);
 				mTimes = RECORD_TIME;
@@ -194,8 +196,8 @@ public class PhoneMicTestActivity extends Activity implements OnClickListener{
 					sendEmptyMessageDelayed(MSG_TEST_MIC_ING, 1000L);
 				} else {
 					removeMessages(MSG_TEST_MIC_ING);
-					sendEmptyMessage(MSG_TEST_MIC_OVER);
-
+					sendEmptyMessage(MSG_TEST_MIC_OVER);					
+					Tools.writeFile("/sys/class/w25q128fw/buzzer", "0");
 				}
 
 				break;
