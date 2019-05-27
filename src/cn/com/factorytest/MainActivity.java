@@ -291,7 +291,7 @@ public class MainActivity extends Activity {
         m_mactitle = (TextView)findViewById(R.id.MacTitle);
         
         m_Button_write_mac_usid = (Button)findViewById(R.id.Button_Writemac);
-		if (Build.MODEL.equals("VIM2") || Build.MODEL.equals("VIM2L")) {
+		if (Build.MODEL.equals("VIM2") || Build.MODEL.equals("VIM2L") || Tools.getBoardType() != Tools.KHADAS_EDGE) {
 			if(DISABLED_WRITE_MAC) {
 				m_Button_write_mac_usid.setVisibility(View.GONE);
 			}
