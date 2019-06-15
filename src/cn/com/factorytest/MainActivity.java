@@ -187,9 +187,9 @@ public class MainActivity extends Activity {
     String readDeviceid = "";
     
     private boolean bIsKeyDown = false;
-    //ÏµÍ³µÆºÍÍøÂçµÆ²âÊÔÊ±¼ä µ¥Î»s
+    //ç³»ç»Ÿç¯å’Œç½‘ç»œç¯æµ‹è¯•æ—¶é—´ å•ä½s
     int ledtime = 60;
-	//videoview È«ÆÁ²¥·ÅÊ±¼ä
+	//videoview å…¨å±æ’­æ”¾æ—¶é—´
     private final long  MSG_PLAY_VIDEO_TIME= 30 * 60 * 1000;
 
     private Context mContext;
@@ -209,11 +209,11 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
 		mContext = this;
         mAudioManager = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);    
-        //×î´óÒôÁ¿    
+        //æœ€å¤§éŸ³é‡    
         maxVolume = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);    
-        //µ±Ç°ÒôÁ¿    
+        //å½“å‰éŸ³é‡    
         currentVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC); 
-        //½øÈë²ú²âapkÉèÖÃ×î´óÒôÁ¿
+        //è¿›å…¥äº§æµ‹apkè®¾ç½®æœ€å¤§éŸ³é‡
         mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, maxVolume, 0); 
         
         m_firmware_version = (TextView)findViewById(R.id.firmware_version_value);
@@ -502,7 +502,7 @@ private void updateEthandWifi(){
     @Override
 	protected void onDestroy() {
 		// TODO Auto-generated method stub
-    	//ÍË³ö²ú²âapk»Ö¸´ÏµÍ³ÒôÁ¿´óĞ¡
+    	//é€€å‡ºäº§æµ‹apkæ¢å¤ç³»ç»ŸéŸ³é‡å¤§å°
     	if(mAudioManager != null)
     	mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, currentVolume, 0); 
 		super.onDestroy();
@@ -864,7 +864,7 @@ private void updateEthandWifi(){
 
 	
 	/**
-	 * ÅĞ¶ÏUSBÓëF
+	 * åˆ¤æ–­USBä¸F
 	 */
 	private void test_volumes() {
 		
@@ -948,7 +948,7 @@ private void updateEthandWifi(){
         }
         return volumes;
     }
-    //½ö½öÔÚÒ»¸öUÅÌ½ÓÈëÇé¿öÏÂÅĞ¶Ï½ÓÈëÄÇ¸öUSB¿Ú
+    //ä»…ä»…åœ¨ä¸€ä¸ªUç›˜æ¥å…¥æƒ…å†µä¸‹åˆ¤æ–­æ¥å…¥é‚£ä¸ªUSBå£
     private boolean isUsb1(){
 		try {
 		   BufferedReader bufferReader = new BufferedReader(new InputStreamReader(Runtime.getRuntime().exec("lsusb").getInputStream()));
