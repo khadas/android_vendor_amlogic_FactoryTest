@@ -41,8 +41,8 @@ public class Tools {
     public static final String Key_Name = (isGxbaby()?"/sys/class/unifykeys/name":"/sys/class/aml_keys/aml_keys/key_name");
     public static final String Key_Read = (isGxbaby()?"/sys/class/unifykeys/read":"/sys/class/aml_keys/aml_keys/key_read");
     public static final String Key_Write = (isGxbaby()?"/sys/class/unifykeys/write":"/sys/class/aml_keys/aml_keys/key_write");
-	public static final String Key_OTP_Mac = "/sys/class/w25q128fw/mac_addr";
-    
+//	public static final String Key_OTP_Mac = "/sys/class/w25q128fw/mac_addr";
+    public static final String Key_OTP_Mac = "/sys/class/wol/mac_addr";    
     public static final String Key_Attach = "/sys/class/unifykeys/attach";
     public static final String Key_Attach_Value = "1";
     
