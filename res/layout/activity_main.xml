@@ -210,6 +210,15 @@
             android:textSize="20sp" >
         </TextView>
         <TextView
+            android:id="@+id/TextView_AGEING"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:textColor="#FF5555FF"
+            android:text="@string/AGEING_Test"
+            android:textSize="25sp" >
+        </TextView>	
+        <TextView
             android:visibility="gone"
             android:id="@+id/MacTitle"
             android:layout_width="match_parent"

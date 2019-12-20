@@ -54,6 +54,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.math.*;
 
 public class MainActivity extends Activity {
 
@@ -65,6 +66,7 @@ public class MainActivity extends Activity {
 	private static final boolean DISABLED_USB2 = false;
 	private static final boolean DISABLED_DEVICE_ID = true;
 	private static final boolean DISABLED_SN  = true;
+    private static boolean ageing_test_ok_flag = false;
     TextView m_firmware_version;
     TextView m_ddr_size;
     TextView m_nand_size;
@@ -89,6 +91,7 @@ public class MainActivity extends Activity {
     TextView m_TextView_Gyro;
     TextView m_TextView_MCU;
     TextView m_TextView_SPIFLASH;
+    TextView m_TextView_AGEING;
 	TextView m_TextView_Gigabit_network;
     TextView m_TextView_Lan;
     TextView m_TextView_Wifi;
@@ -158,7 +161,9 @@ public class MainActivity extends Activity {
 	private final int MSG_PD2_TEST_ERROR =  122;
 	private final int MSG_PD1_TEST_ERROR =  123;	
 	private final int MSG_Charge_TEST_ERROR =  124;
-	private final int MSG_Charge_TEST_OK =  125;				
+	private final int MSG_Charge_TEST_OK =  125;	
+	private final int MSG_AGEING_TEST_ERROR =	126;
+	private final int MSG_AGEING_TEST_OK =  127;				
     private final int MSG_TIME = 777;
     private static final String nullip = "0.0.0.0";
     private static final String USB_PATH = (Tools.isAndroid5_1_1()?"/storage/udisk":"/storage/external_storage/sd");
@@ -248,6 +253,7 @@ public class MainActivity extends Activity {
 		m_TextView_HDMI = (TextView)findViewById(R.id.TextView_HDMI);	
         m_TextView_PD12 = (TextView)findViewById(R.id.TextView_PD12);
 		m_TextView_Charge = (TextView)findViewById(R.id.TextView_Charge);			
+        m_TextView_AGEING = (TextView)findViewById(R.id.TextView_AGEING);
         m_TextView_Wifi = (TextView)findViewById(R.id.TextView_Wifi);
 		m_TextView_BT = (TextView)findViewById(R.id.TextView_BT);
 		m_TextView_Rtc = (TextView)findViewById(R.id.TextView_Rtc);
@@ -326,9 +332,38 @@ public class MainActivity extends Activity {
                 test_Thread();
             }
         }.start();
+        new Thread() {
+            public void run() {
+		while(true) {
+			try {
+				
+				if(0 == FactoryReceiver.ageing_flag){
+					Tools.writeFile(Tools.Green_Led,"default-on");
+					Thread.sleep(1000);
+					Tools.writeFile(Tools.Green_Led, "off");
+					Thread.sleep(1000);
+				}
+				else
+					test_cpu_ageing();
+				if(2 == VideoFragment.ageing_test_step && !ageing_test_ok_flag){
+					mHandler.sendEmptyMessage(MSG_AGEING_TEST_OK);
+					ageing_test_ok_flag = true;
+				}
+				else if(1 == VideoFragment.ageing_test_step && ageing_test_ok_flag){
+					mHandler.sendEmptyMessage(MSG_AGEING_TEST_ERROR);
+					ageing_test_ok_flag = false;
+				}
+				
+			}  catch(Exception localException1){
+
+			}
+		}
+            }
+        }.start();
     }
  
     public void test_Thread() {
+		test_AGEING();
         test_Gsensor();
         test_Gyro();
         test_Gesture();
@@ -743,6 +778,30 @@ private void updateEthandWifi(){
 		mHandler.sendEmptyMessage(MSG_HDMI_TEST_ERROR);			
 		
   }
+
+  private void test_AGEING() {
+      String pathname = "/sys/class/wol/ageing_test";
+	try (FileReader reader = new FileReader(pathname);
+		 BufferedReader br = new BufferedReader(reader)) {
+		String line;
+		while ((line = br.readLine()) != null) {
+			int id = Integer.parseInt(line);
+			Log.d(TAG, "hlm AGEING: " + id);
+			if(1==id){
+				ageing_test_ok_flag = true;
+				mHandler.sendEmptyMessage(MSG_AGEING_TEST_OK);	
+				return;
+			}					
+		}		
+	} catch (IOException e) {
+		e.printStackTrace();
+	}
+	ageing_test_ok_flag = false;
+	if(0 == FactoryReceiver.ageing_flag)
+		m_TextView_AGEING.setVisibility(View.GONE);
+	else
+		mHandler.sendEmptyMessage(MSG_AGEING_TEST_ERROR);
+  }  
   
    private List<File> get_input_list(String path) {
         int fileNum = 0;
@@ -807,7 +866,13 @@ private void updateEthandWifi(){
         else
             mHandler.sendEmptyMessage(MSG_PCIE_TEST_ERROR);
    }
-
+      private void test_cpu_ageing()
+    {
+	  	BigDecimal a = new BigDecimal("1");
+		BigDecimal b = new BigDecimal("7");
+		System.out.println("1/7 =" + a.divide(b, 100, RoundingMode.HALF_UP));
+    }
+	  
     private boolean test_Wifi()
     {
 
@@ -1059,6 +1124,25 @@ private void updateEthandWifi(){
                 }
                 break;
 
+                case  MSG_GIGABIT_TEST_OK:
+                {
+                    String strTxt = getResources().getString(R.string.Gigabit_Test) + "    " + getResources().getString(R.string.Test_Ok);
+
+                    m_TextView_Gigabit.setText(strTxt);
+                    m_TextView_Gigabit.setTextColor(0xFF55FF55);
+					Log.d(TAG,"MSG_GIGABIT_TEST_OK");
+                }
+                break;
+
+                case  MSG_GIGABIT_TEST_ERROR:
+                {
+                    String strTxt = getResources().getString(R.string.Gigabit_Test) + "    " + getResources().getString(R.string.Test_Fail);
+
+                    m_TextView_Gigabit.setText(strTxt);
+                    m_TextView_Gigabit.setTextColor(0xFFFF5555);
+					Log.d(TAG,"MSG_GIGABIT_TEST_ERROR");
+                }
+                break;
                 case  MSG_HDMI_TEST_OK:
                 {
                     String strTxt = getResources().getString(R.string.HDMI_Test) + "    " + getResources().getString(R.string.Test_Ok);

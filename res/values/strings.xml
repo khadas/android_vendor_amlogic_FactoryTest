@@ -17,6 +17,7 @@
     <string name="DeviceidAddr">Deviceid Address:</string>
     <string name="TF_Test">TF</string>
     <string name="MCU_Test">I2C_MCU</string>
+    <string name="AGEING_Test">老化测试</string>
     <string name="SPIFLASH_Test">SPI_Flash</string>	
     <string name="Gigabit_network_Test">GBE</string>	    
     <string name="USB1_Test">USB2.0</string>

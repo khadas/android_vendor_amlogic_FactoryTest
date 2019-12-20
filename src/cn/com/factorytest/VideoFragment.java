@@ -28,7 +28,9 @@ public class VideoFragment extends Fragment implements MediaPlayer.OnCompletionL
     Date m_StartDate = new Date();
     Handler mVideoHandler = new VideoHandler();
     final int MSG_UPDATE_TIME =  0;
-
+	static int ageing_test_step = 0;
+	static int led_status = 0;
+	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -96,6 +98,22 @@ public class VideoFragment extends Fragment implements MediaPlayer.OnCompletionL
         public void handleMessage(Message msg) {
             switch (msg.what){
                 case MSG_UPDATE_TIME:
+					if(1 == FactoryReceiver.ageing_flag){
+						if(2 == ageing_test_step && 2 != led_status){
+							Tools.writeFile(Tools.White_Led,"heartbeat");//default-on off heartbeat
+							led_status = 2;
+						}
+						else{
+							if(1 == led_status){
+								Tools.writeFile(Tools.White_Led,"off");//default-on off heartbeat
+								led_status = 0;
+							}
+							else if(0 == led_status){
+								Tools.writeFile(Tools.White_Led,"default-on");//default-on off heartbeat
+								led_status = 1;
+							}
+						}
+					}
                     mTestTime.setText(getTime());
                     mVideoHandler.sendEmptyMessageDelayed(MSG_UPDATE_TIME, 1000);
                     break;
@@ -109,10 +127,18 @@ public class VideoFragment extends Fragment implements MediaPlayer.OnCompletionL
         long between = (newDate.getTime() - m_StartDate.getTime() ) / 1000;
         long day1 = between / ( 24 * 3600 );
         long hour1 = between % ( 24 * 3600 ) / 3600;
+		long hour_ageing = between / 3600;
         long minute1 = between % 3600 / 60;
         long second1 = between % 60;
-
-
+		
+		if(1 == FactoryReceiver.ageing_flag){
+			if((hour_ageing >= FactoryReceiver.ageing_time) && 1 == ageing_test_step){
+				ageing_test_step = 2;
+			}
+			else if(0 == ageing_test_step){
+				ageing_test_step = 1;
+			}
+		}
         if(between > (60 * 60 * 2) )
         {
             return getResources().getString(R.string.long_test_finish);
