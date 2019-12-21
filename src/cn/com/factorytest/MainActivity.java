@@ -297,7 +297,7 @@ public class MainActivity extends Activity {
         m_mactitle = (TextView)findViewById(R.id.MacTitle);
         
         m_Button_write_mac_usid = (Button)findViewById(R.id.Button_Writemac);
-		if (Build.MODEL.equals("VIM2") || Build.MODEL.equals("VIM2L") || Tools.getBoardType() != Tools.KHADAS_EDGE) {
+		if (Build.MODEL.equals("VIM2") || Build.MODEL.equals("VIM2L")) {
 			if(DISABLED_WRITE_MAC) {
 				m_Button_write_mac_usid.setVisibility(View.GONE);
 			}
@@ -476,7 +476,7 @@ private void updateEthandWifi(){
         
         m_ddr_size.setText((Tools.getmem_TOLAL()*100/1024/1024/100.0)+" GB");
         m_nand_size.setText(Tools.getRomSize(this));
-        m_firmware_version.setText(Build.VERSION.INCREMENTAL);
+        m_firmware_version.setText(Build.DISPLAY.ID);
         m_device_type.setText(Build.MODEL);
         
         updateEthandWifi();
