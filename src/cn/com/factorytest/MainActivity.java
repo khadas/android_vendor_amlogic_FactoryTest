@@ -268,8 +268,8 @@ public class MainActivity extends Activity {
 			m_Button_speaker_MIC.setVisibility(View.GONE);
             m_Button_DisableWol.setVisibility(View.GONE);
 			m_TextView_TF.setVisibility(View.GONE);
-			m_TextView_Lan.setVisibility(View.GONE);
-			m_TextView_Gigabit_network.setVisibility(View.GONE);	
+			//m_TextView_Lan.setVisibility(View.GONE);
+			//m_TextView_Gigabit_network.setVisibility(View.GONE);	
 			m_TextView_Charge.setVisibility(View.GONE);			
         }	
 		if (Tools.getBoardType() == Tools.KHADAS_EDGEV) {	
@@ -476,7 +476,7 @@ private void updateEthandWifi(){
         
         m_ddr_size.setText((Tools.getmem_TOLAL()*100/1024/1024/100.0)+" GB");
         m_nand_size.setText(Tools.getRomSize(this));
-        m_firmware_version.setText(Build.DISPLAY.ID);
+        m_firmware_version.setText(Build.DISPLAY);
         m_device_type.setText(Build.MODEL);
         
         updateEthandWifi();
@@ -1124,25 +1124,6 @@ private void updateEthandWifi(){
                 }
                 break;
 
-                case  MSG_GIGABIT_TEST_OK:
-                {
-                    String strTxt = getResources().getString(R.string.Gigabit_Test) + "    " + getResources().getString(R.string.Test_Ok);
-
-                    m_TextView_Gigabit.setText(strTxt);
-                    m_TextView_Gigabit.setTextColor(0xFF55FF55);
-					Log.d(TAG,"MSG_GIGABIT_TEST_OK");
-                }
-                break;
-
-                case  MSG_GIGABIT_TEST_ERROR:
-                {
-                    String strTxt = getResources().getString(R.string.Gigabit_Test) + "    " + getResources().getString(R.string.Test_Fail);
-
-                    m_TextView_Gigabit.setText(strTxt);
-                    m_TextView_Gigabit.setTextColor(0xFFFF5555);
-					Log.d(TAG,"MSG_GIGABIT_TEST_ERROR");
-                }
-                break;
                 case  MSG_HDMI_TEST_OK:
                 {
                     String strTxt = getResources().getString(R.string.HDMI_Test) + "    " + getResources().getString(R.string.Test_Ok);
@@ -1160,6 +1141,25 @@ private void updateEthandWifi(){
                     m_TextView_HDMI.setText(strTxt);
                     m_TextView_HDMI.setTextColor(0xFFFF5555);
 					Log.d(TAG,"MSG_HDMI_TEST_ERROR");
+                }
+                break;
+                case  MSG_AGEING_TEST_OK:
+                {
+                    String strTxt = getResources().getString(R.string.AGEING_Test) + "    " + getResources().getString(R.string.Test_Ok);
+
+                    m_TextView_AGEING.setText(strTxt);
+                    m_TextView_AGEING.setTextColor(0xFF55FF55);
+					Log.d(TAG,"MSG_AGEING_TEST_OK");
+                }
+                break;
+
+                case  MSG_AGEING_TEST_ERROR:
+                {
+                    String strTxt = getResources().getString(R.string.AGEING_Test) + "    " + getResources().getString(R.string.Test_Fail);
+
+                    m_TextView_AGEING.setText(strTxt);
+                    m_TextView_AGEING.setTextColor(0xFFFF5555);
+					Log.d(TAG,"MSG_AGEING_TEST_ERROR");
                 }
                 break;
                 case  MSG_MCU_TEST_OK:

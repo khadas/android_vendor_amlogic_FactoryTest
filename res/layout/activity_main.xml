@@ -216,7 +216,7 @@
             android:layout_height="match_parent"
             android:textColor="#FF5555FF"
             android:text="@string/AGEING_Test"
-            android:textSize="25sp" >
+            android:textSize="20sp" >
         </TextView>	
         <TextView
             android:visibility="gone"
