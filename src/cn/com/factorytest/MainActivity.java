@@ -268,8 +268,8 @@ public class MainActivity extends Activity {
 			m_Button_speaker_MIC.setVisibility(View.GONE);
             m_Button_DisableWol.setVisibility(View.GONE);
 			m_TextView_TF.setVisibility(View.GONE);
-			//m_TextView_Lan.setVisibility(View.GONE);
-			//m_TextView_Gigabit_network.setVisibility(View.GONE);	
+			m_TextView_Lan.setVisibility(View.GONE);
+			m_TextView_Gigabit_network.setVisibility(View.GONE);	
 			m_TextView_Charge.setVisibility(View.GONE);			
         }	
 		if (Tools.getBoardType() == Tools.KHADAS_EDGEV) {	
@@ -297,11 +297,8 @@ public class MainActivity extends Activity {
         m_mactitle = (TextView)findViewById(R.id.MacTitle);
         
         m_Button_write_mac_usid = (Button)findViewById(R.id.Button_Writemac);
-		if (Build.MODEL.equals("VIM2") || Build.MODEL.equals("VIM2L")) {
-			if(DISABLED_WRITE_MAC) {
-				m_Button_write_mac_usid.setVisibility(View.GONE);
-			}
-		} else {
+
+		if(DISABLED_WRITE_MAC) {
 			m_Button_write_mac_usid.setVisibility(View.GONE);
 		}
         m_Button_PowerLed = (Button)findViewById(R.id.Button_PowerLed);

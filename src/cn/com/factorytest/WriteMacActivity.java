@@ -32,6 +32,7 @@ public class WriteMacActivity extends Activity {
 	private boolean SN_SHOW = false;
 	private boolean USID_SHOW = false;
 	private boolean DEVICE_ID_SHOW = false;
+	private boolean WriteMac_ok_flag = false;
 	private int MAC_LENGTH = 17;
 
 	private final int MSG_TIME = 777;
@@ -110,6 +111,9 @@ public class WriteMacActivity extends Activity {
 				
 		m_EditMac.setText("");
 		m_EditMac.requestFocus();
+		
+		if(WriteMac_ok_flag)
+			this.finish();
 	}
 	
 	public void OnWriteSn()
@@ -201,6 +205,7 @@ public class WriteMacActivity extends Activity {
 					Log.d(TAG,"MAC ="+ mac + " format_err= "+format_err);
 					if (!format_err) {
 						Tools.writeFile(Tools.Key_OTP_Mac, mac);
+						WriteMac_ok_flag = true;
 					}
 				}
 			}
@@ -329,7 +334,7 @@ public class WriteMacActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.write_mac);
-
+		WriteMac_ok_flag = false;
 		m_EditMac = (EditText)findViewById(R.id.EditTextMac);		
 		m_EditMac.setInputType(InputType.TYPE_NULL);
 		m_EditMac.addTextChangedListener(mTextWatcher);
