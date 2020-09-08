@@ -335,9 +335,11 @@ public class MainActivity extends Activity {
 			try {
 				
 				if(0 == FactoryReceiver.ageing_flag){
-					Tools.writeFile(Tools.Green_Led,"default-on");
+					Tools.writeFile(Tools.White_Led,"default-on");
+					Tools.writeFile(Tools.Red_Led,"default-on");
 					Thread.sleep(1000);
-					Tools.writeFile(Tools.Green_Led, "off");
+					Tools.writeFile(Tools.White_Led, "off");
+					Tools.writeFile(Tools.Red_Led, "off");
 					Thread.sleep(1000);
 				}
 				else

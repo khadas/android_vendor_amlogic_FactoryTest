@@ -63,7 +63,7 @@ public class Tools {
     public static  final String Power_Led = "/proc/ledlight/powerled/state";
 	public static  final String Ethernet_Led = "/sys/class/leds/led-sys/trigger";
 	public static  final String White_Led = "/sys/class/leds/sys_led/trigger";  //default-on off heartbeat
-	public static  final String Green_Led = "/sys/class/leds/sys_led/trigger";
+	public static  final String Red_Led = "/sys/class/leds/red_led/trigger";
     public static  final String Ethernet_status = "/sys/class/net/eth0/operstate";
 	public static  final String Rtc_time = "/sys/class/rtc/rtc0/time";
 
