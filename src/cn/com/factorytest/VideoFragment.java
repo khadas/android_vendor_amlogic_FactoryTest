@@ -133,9 +133,11 @@ public class VideoFragment extends Fragment implements MediaPlayer.OnCompletionL
 		
 		if(1 == FactoryReceiver.ageing_flag){
 			if((hour_ageing >= FactoryReceiver.ageing_time) && 1 == ageing_test_step){
+				Tools.writeFile(Tools.ageing_status,"1");
 				ageing_test_step = 2;
 			}
 			else if(0 == ageing_test_step){
+				Tools.writeFile(Tools.ageing_status,"0");
 				ageing_test_step = 1;
 			}
 		}

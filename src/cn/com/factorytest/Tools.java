@@ -66,6 +66,7 @@ public class Tools {
 	public static  final String Red_Led = "/sys/class/leds/red_led/trigger";
     public static  final String Ethernet_status = "/sys/class/net/eth0/operstate";
 	public static  final String Rtc_time = "/sys/class/rtc/rtc0/time";
+	public static  final String ageing_status = "/sys/class/wol/ageing_test";  
 
 	public static String readFile(String file)
     {
