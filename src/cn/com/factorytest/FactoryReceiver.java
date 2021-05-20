@@ -22,12 +22,15 @@ public class FactoryReceiver extends BroadcastReceiver{
 	private static final String rst_mcu_file = "khadas_rst_mcu.xml";
 	public static int ageing_flag = 0;
 	public static int ageing_time = 0;
-	
+
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		// TODO Auto-generated method stub
 		String action = intent.getAction();
 		Uri uri = intent.getData();
+		Log.e(TAG, "hlm2 action " + action);
+		Log.e(TAG, "hlm2 uri " + uri);
+		
 		if (uri.getScheme().equals("file")) {
 			String path = uri.getPath();
             String externalStoragePath = Environment.getExternalStorageDirectory().getPath();
@@ -42,7 +45,7 @@ public class FactoryReceiver extends BroadcastReceiver{
             if (path.startsWith(legacyPath)) {
                 path = externalStoragePath + path.substring(legacyPath.length());                                                          
             }
-
+			Log.e(TAG, "hlm2 path= " + path);
 			if (Intent.ACTION_MEDIA_MOUNTED.equals(action)) {
 				String rst_mcu_fullpath = path+"/"+rst_mcu_file;
 				File rstfile = new File(rst_mcu_fullpath);
@@ -71,7 +74,7 @@ public class FactoryReceiver extends BroadcastReceiver{
 					 try {
 					 	ageing_flag = 0;
 					 	Log.e(TAG, "hlm Thread.sleep(2000) " + ageing_flag);
-						Thread.sleep(2000);
+						Thread.sleep(20);
 					 } catch (InterruptedException e) {
 						 e.printStackTrace();
 					 }
@@ -89,7 +92,7 @@ public class FactoryReceiver extends BroadcastReceiver{
 							 ageing_flag = 1;
 							 ageing_time = 4;
 							 Log.e(TAG, "hlm Thread.sleep(2000) ageing_flag" + ageing_flag);
-							 Thread.sleep(2000);
+							 Thread.sleep(20);
 						  } catch (InterruptedException e) {
 							  e.printStackTrace();
 						  }
@@ -107,7 +110,7 @@ public class FactoryReceiver extends BroadcastReceiver{
 								 ageing_flag = 1;
 								 ageing_time = 12;
 							  Log.e(TAG, "hlm Thread.sleep(2000) ageing_flag" + ageing_flag);
-								 Thread.sleep(2000);
+								 Thread.sleep(20);
 							  } catch (InterruptedException e) {
 								  e.printStackTrace();
 							  }
@@ -125,7 +128,7 @@ public class FactoryReceiver extends BroadcastReceiver{
 									 ageing_flag = 1;
 									 ageing_time = 24;
 								  Log.e(TAG, "hlm Thread.sleep(2000) ageing_flag" + ageing_flag);
-									 Thread.sleep(2000);
+									 Thread.sleep(20);
 								  } catch (InterruptedException e) {
 									  e.printStackTrace();
 								  }
@@ -143,7 +146,7 @@ public class FactoryReceiver extends BroadcastReceiver{
 										  ageing_flag = 1;
 										  ageing_time = 8;
 									   Log.e(TAG, "hlm Thread.sleep(2000) ageing_flag" + ageing_flag);
-										  Thread.sleep(2000);
+										  Thread.sleep(20);
 									   } catch (InterruptedException e) {
 										   e.printStackTrace();
 									   }

@@ -1033,8 +1033,6 @@ private void updateEthandWifi(){
 				continue;
 			tmp[num] = tmp[num] + list[z];
 		}
-		usb3_0_flag = 0;
-		usbStatus[0] = xx;
 		for (int i=0; i< tmp.length; i++) {
 			if ((tmp[i].indexOf("(O)") != -1) && ((tmp[i].indexOf("Ver= 3.") != -1))) {
 				Log.d(TAG, "USB3.0 is OK");
