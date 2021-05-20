@@ -204,6 +204,7 @@ public class MainActivity extends Activity {
 	private int BT_try_count = 1;
 	private int btLevel = 0;
 	private final String BTSSID="Khadas";
+    String[] usbStatus = new String[4];
 	private BTAdmin localBTAdmin;
 
     
@@ -341,6 +342,10 @@ public class MainActivity extends Activity {
 					Tools.writeFile(Tools.White_Led, "off");
 					Tools.writeFile(Tools.Red_Led, "off");
 					Thread.sleep(1000);
+					test_Gigabit_network();
+					test_HDMI();
+					test_volumes();
+					test_ETH();
 				}
 				else
 					test_cpu_ageing();
@@ -361,8 +366,46 @@ public class MainActivity extends Activity {
         }.start();
     }
  
+ 	private String execSuCmd(String cmd) {
+		try {
+			Process mProcess = Runtime.getRuntime().exec("cmdclient "+cmd);
+			BufferedReader mInputReader = new BufferedReader(new InputStreamReader(mProcess.getInputStream()));
+			BufferedReader mErrorReader = new BufferedReader(new InputStreamReader(mProcess.getErrorStream()));
+			String msg = "";
+			String line;
+			int i = 0;
+			while ((line = mInputReader.readLine()) != null) {
+				if(0!=i)
+					msg += '\n';
+				msg += line;
+				i = 1;
+			}
+			mInputReader.close();
+
+			i = 0;
+			while ((line = mErrorReader.readLine()) != null) {
+				if(0!=i)
+					msg += '\n';
+				msg += line;
+				i = 1;
+			}
+			mErrorReader.close();
+			mProcess.destroy();
+			//Log.d(TAG, msg);
+			return msg;
+		} catch (IOException e) {
+			e.printStackTrace();
+			return "execSuCmd Error";
+		}
+	}
+	
     public void test_Thread() {
 		test_AGEING();
+        mHandler.sendEmptyMessage(MSG_USB1_TEST_XL_ERROR);
+        mHandler.sendEmptyMessage(MSG_USB2_TEST_XL_ERROR);	
+		//mHandler.sendEmptyMessage(MSG_SPIFLASH_TEST_ERROR);	
+		//mHandler.sendEmptyMessage(MSG_GSENSOR_TEST_ERROR);	
+		//mHandler.sendEmptyMessage(MSG_GYRO_TEST_ERROR);		
         test_Gsensor();
         test_Gyro();
         test_Gesture();
@@ -419,6 +462,8 @@ private class BTDeviceReceiver extends BroadcastReceiver{
 						if(rssi>CONFIG_BT_RSSI){
 							btLevel = -rssi;
 							BT_ERR = false;
+							//BT_ERR = true;
+							//BT_try_count = 1;
 							mHandler.sendEmptyMessage(MSG_BT_TEST_OK);
 						}else {
                    			BT_ERR = true;
@@ -666,59 +711,53 @@ private void updateEthandWifi(){
   }
 
     private void test_PD() {
+		int usb0,usb1,usb2;
+        String msg = execSuCmd("i2cget -f -y 4 0x22 1");
+		if (msg.contains("failed") || msg.contains("Error")) {
+			usb1=0;
+		}else{
+			usb1=2;
+		}
 
-        String pathname2 = "/sys/class/w25q128fw/fusb302";
-		try (FileReader reader2 = new FileReader(pathname2);
-			 BufferedReader br2 = new BufferedReader(reader2)) {
-			String line2;
-			while ((line2 = br2.readLine()) != null) {
-				int usb2 = Integer.parseInt(line2);
-				Log.d(TAG, "hlm fusb302: " + usb2);
-				if(3 == usb2){
-					mHandler.sendEmptyMessage(MSG_PD12_TEST_OK);	
-				}
-				else if(2 == usb2){
-					mHandler.sendEmptyMessage(MSG_PD1_TEST_ERROR);	
-				}
-				else if(1 == usb2){
-					mHandler.sendEmptyMessage(MSG_PD2_TEST_ERROR);	
-				}
-				else{
-					mHandler.sendEmptyMessage(MSG_PD12_TEST_ERROR);	
-				}
-			}		
-		} catch (IOException e) {
-			e.printStackTrace();
+        String msg0 = execSuCmd("i2cget -f -y 8 0x22 1");
+		if (msg0.contains("failed") || msg0.contains("Error")) {
+			usb0=0;
+		}else{
+			usb0=1;
+		}
+		
+		usb2 = usb1|usb0;
+		Log.d(TAG, "hlm fusb302: " + usb2);
+		if(3 == usb2){
+			mHandler.sendEmptyMessage(MSG_PD12_TEST_OK);	
+		}
+		else if(2 == usb2){
+			mHandler.sendEmptyMessage(MSG_PD1_TEST_ERROR);	
+		}
+		else if(1 == usb2){
+			mHandler.sendEmptyMessage(MSG_PD2_TEST_ERROR);	
+		}
+		else{
+			mHandler.sendEmptyMessage(MSG_PD12_TEST_ERROR);	
 		}
   }
 
   private void test_Charge() {
-
-        String pathname = "/sys/class/w25q128fw/charge";
-		try (FileReader reader = new FileReader(pathname);
-			 BufferedReader br = new BufferedReader(reader)) {
-			String line;
-			while ((line = br.readLine()) != null) {
-				int id = Integer.parseInt(line);
-				Log.d(TAG, "hlm charge: " + id);
-				if(1==id){
-					mHandler.sendEmptyMessage(MSG_Charge_TEST_OK);	
-					return;
-				}					
-			}		
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		mHandler.sendEmptyMessage(MSG_Charge_TEST_ERROR);			
+        String msg = execSuCmd("i2cget -f -y 8 0x6b 0x6");
+		if (msg.contains("failed") || msg.contains("Error")) {
+			mHandler.sendEmptyMessage(MSG_Charge_TEST_ERROR);
+		}else{
+			mHandler.sendEmptyMessage(MSG_Charge_TEST_OK);
+		}		
   }
   
   private void test_MCU() {
-
-        File file = new File("/sys/class/wol/enable");
-        if (file.exists())
-            mHandler.sendEmptyMessage(MSG_MCU_TEST_OK);
-        else
-            mHandler.sendEmptyMessage(MSG_MCU_TEST_ERROR);
+        String msg = execSuCmd("i2cget -f -y 8 0x18 0x6");
+		if (msg.contains("failed") || msg.contains("Error")) {
+			mHandler.sendEmptyMessage(MSG_MCU_TEST_ERROR);
+		}else{
+			mHandler.sendEmptyMessage(MSG_MCU_TEST_OK);
+		}
   }
 
   private void test_SPIFLASH() {
@@ -752,7 +791,11 @@ private void updateEthandWifi(){
 				if(1000==speed){
 					mHandler.sendEmptyMessage(MSG_Gigabit_network_TEST_OK);	
 					return;
-				}					
+				}	
+				if(100==speed){
+					mHandler.sendEmptyMessage(MSG_Gigabit_network_TEST_OK);	
+					return;
+				}				
 			}		
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -851,11 +894,12 @@ private void updateEthandWifi(){
    }
 
    private void test_Gesture() {
-        File file = new File("/sys/kernel/debug/regmap/8-0039-apds9960_regmap");
-        if (file.exists())
-            mHandler.sendEmptyMessage(MSG_GESTURE_TEST_OK);
-        else
-            mHandler.sendEmptyMessage(MSG_GESTURE_TEST_ERROR);
+        String msg = execSuCmd("i2cget -f -y 8 0x39 0");
+		if (msg.contains("failed") || msg.contains("Error")) {
+			mHandler.sendEmptyMessage(MSG_GESTURE_TEST_ERROR);
+		}else{
+			mHandler.sendEmptyMessage(MSG_GESTURE_TEST_OK);
+		} 
    }
 	
    private void test_Pcie() {
@@ -952,6 +996,7 @@ private void updateEthandWifi(){
 		Log.d(TAG, "----- android6.0 -----");
 		mHandler.sendEmptyMessage(MSG_android_6_0_TEXT_LAYOUT);
 		Boolean[] usbOrSd = Tools.isUsbOrSd(MainActivity.this);
+		int usb3_0_flag = 0;
 		
 		
 		if(usbOrSd[0]){
@@ -960,8 +1005,67 @@ private void updateEthandWifi(){
 			mHandler.sendEmptyMessage(MSG_TF_TEST_XL_ERROR);
 		}
 		
-	}
+        for (int i=0; i< usbStatus.length; i++) {
+            usbStatus[i] = getResources().getString(R.string.Test_Fail);
+        }
+
+		String val = Tools.readFile("/sys/kernel/debug/usb/devices");
+		if (val.indexOf("(O)") == -1) {
+			Log.e(TAG, "=========USB2.0 and USB3.0 is bad");
+			mHandler.sendEmptyMessage(MSG_USB1_TEST_XL_ERROR);
+			mHandler.sendEmptyMessage(MSG_USB2_TEST_XL_ERROR);
+			return;
+		}
+
+		int length;
+		String[] list = val.split("T:|B:|D:|P:|S:|C:|I:|E:");
+		int num = -1;
+		int count = getSubCount(val, "Bus=");
+		String[] tmp = new String[count];
+		for (int z=0; z< list.length; z++) {
+
+			if (list[z].indexOf("Bus=") != -1) {
+				num++;
+			}
+			if (num == count)
+				break;
+			if (num == -1)
+				continue;
+			tmp[num] = tmp[num] + list[z];
+		}
+		usb3_0_flag = 0;
+		usbStatus[0] = xx;
+		for (int i=0; i< tmp.length; i++) {
+			if ((tmp[i].indexOf("(O)") != -1) && ((tmp[i].indexOf("Ver= 3.") != -1))) {
+				Log.d(TAG, "USB3.0 is OK");
+				usb3_0_flag = 1;
+			}else if ((tmp[i].indexOf("(O)") != -1) && (tmp[i].indexOf("Bus=05") != -1) && (tmp[i].indexOf("Lev=01") != -1)) {
+				Log.d("TAG", "USB2.0-0 is OK");
+                usbStatus[0] = getResources().getString(R.string.Test_Ok);
+			}
+		}
+		if(usbStatus[0].equals(getResources().getString(R.string.Test_Ok))) {
+            mHandler.sendEmptyMessage(MSG_USB1_TEST_XL_OK);
+        }else{
+            mHandler.sendEmptyMessage(MSG_USB1_TEST_XL_ERROR);
+        }
+		
+		if(1 == usb3_0_flag)
+			mHandler.sendEmptyMessage(MSG_USB2_TEST_XL_OK);
+		else
+			mHandler.sendEmptyMessage(MSG_USB2_TEST_XL_ERROR);
+    }
 	
+
+    private  int getSubCount(String str, String key) {
+        int count = 0;
+        int index = 0;
+        while ((index = str.indexOf(key, index)) != -1) {
+             index = index + key.length();
+             count++;
+        }
+        return count;
+    }
 	
     private void test_android5_1(){
 		Log.d(TAG, "----- android5.1 -----");

@@ -149,7 +149,20 @@ public class Tools {
         }
         else if(status.equals("up") )
         {
-            return true;
+			try {
+				Process mProcess = Runtime.getRuntime().exec("cmdclient "+"ifconfig");
+				BufferedReader mInputReader = new BufferedReader(new InputStreamReader(mProcess.getInputStream()));
+				String line;
+				while ((line = mInputReader.readLine()) != null) {
+					if (line.contains("192.168")) {
+						return true;
+					}
+				}
+				mInputReader.close();
+				mProcess.destroy();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}			
         }
 
         return false;
