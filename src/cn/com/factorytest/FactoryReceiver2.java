@@ -20,8 +20,8 @@ public class FactoryReceiver2 extends BroadcastReceiver{
 	private static final String ageing_udiskfile24 = "khadas_test_24.xml";
 	private static final String rebootfile = "khadas_reboot.xml";
 	private static final String rst_mcu_file = "khadas_rst_mcu.xml";
-	public static int ageing_flag = 0;
-	public static int ageing_time = 0;
+	//public static int ageing_flag = 0;
+	//public static int ageing_time = 0;
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
@@ -64,8 +64,8 @@ public class FactoryReceiver2 extends BroadcastReceiver{
 					File file = new File(fullpath);
 					 if(file.exists() && file.isFile()){
 						 try {
-							ageing_flag = 0;
-							Log.e(TAG, "hlm Thread.sleep(2000) " + ageing_flag);
+							FactoryReceiver.ageing_flag = 0;
+							Log.e(TAG, "hlm Thread.sleep(2000) " + FactoryReceiver.ageing_flag);
 							Thread.sleep(20);
 						 } catch (InterruptedException e) {
 							 e.printStackTrace();
@@ -73,7 +73,7 @@ public class FactoryReceiver2 extends BroadcastReceiver{
 						 Intent i = new Intent();
 						 i.setClassName("cn.com.factorytest", "cn.com.factorytest.MainActivity");
 						 i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-						 Log.e(TAG, "hlm startActivity " + ageing_flag);
+						 Log.e(TAG, "hlm startActivity " + FactoryReceiver.ageing_flag);
 						 context.startActivity(i);
 					 }
 					 else{
@@ -81,9 +81,9 @@ public class FactoryReceiver2 extends BroadcastReceiver{
 						 File ageing_file4 = new File(ageing_fullpath4);
 						  if(ageing_file4.exists() && ageing_file4.isFile()){
 							  try {
-								 ageing_flag = 1;
-								 ageing_time = 4;
-								 Log.e(TAG, "hlm Thread.sleep(2000) ageing_flag" + ageing_flag);
+								 FactoryReceiver.ageing_flag = 1;
+								 FactoryReceiver.ageing_time = 4;
+								 Log.e(TAG, "hlm Thread.sleep(2000) FactoryReceiver.ageing_flag" + FactoryReceiver.ageing_flag);
 								 Thread.sleep(20);
 							  } catch (InterruptedException e) {
 								  e.printStackTrace();
@@ -91,7 +91,7 @@ public class FactoryReceiver2 extends BroadcastReceiver{
 							  Intent i = new Intent();
 							  i.setClassName("cn.com.factorytest", "cn.com.factorytest.MainActivity");
 							  i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-							  Log.e(TAG, "hlm startActivity ageing_time" + ageing_time);
+							  Log.e(TAG, "hlm startActivity FactoryReceiver.ageing_time" + FactoryReceiver.ageing_time);
 							  context.startActivity(i);
 						  }
 						  else{
@@ -99,9 +99,9 @@ public class FactoryReceiver2 extends BroadcastReceiver{
 							 File ageing_file12 = new File(ageing_fullpath12);
 							  if(ageing_file12.exists() && ageing_file12.isFile()){
 								  try {
-									 ageing_flag = 1;
-									 ageing_time = 12;
-								  Log.e(TAG, "hlm Thread.sleep(2000) ageing_flag" + ageing_flag);
+									 FactoryReceiver.ageing_flag = 1;
+									 FactoryReceiver.ageing_time = 12;
+								  Log.e(TAG, "hlm Thread.sleep(2000) FactoryReceiver.ageing_flag" + FactoryReceiver.ageing_flag);
 									 Thread.sleep(20);
 								  } catch (InterruptedException e) {
 									  e.printStackTrace();
@@ -109,7 +109,7 @@ public class FactoryReceiver2 extends BroadcastReceiver{
 								  Intent i = new Intent();
 								  i.setClassName("cn.com.factorytest", "cn.com.factorytest.MainActivity");
 								  i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-								  Log.e(TAG, "hlm startActivity ageing_time" + ageing_time);
+								  Log.e(TAG, "hlm startActivity FactoryReceiver.ageing_time" + FactoryReceiver.ageing_time);
 								  context.startActivity(i);
 							  }
 							  else{
@@ -117,9 +117,9 @@ public class FactoryReceiver2 extends BroadcastReceiver{
 								 File ageing_file24 = new File(ageing_fullpath24);
 								  if(ageing_file24.exists() && ageing_file24.isFile()){
 									  try {
-										 ageing_flag = 1;
-										 ageing_time = 24;
-									  Log.e(TAG, "hlm Thread.sleep(2000) ageing_flag" + ageing_flag);
+										 FactoryReceiver.ageing_flag = 1;
+										 FactoryReceiver.ageing_time = 24;
+									  Log.e(TAG, "hlm Thread.sleep(2000) FactoryReceiver.ageing_flag" + FactoryReceiver.ageing_flag);
 										 Thread.sleep(20);
 									  } catch (InterruptedException e) {
 										  e.printStackTrace();
@@ -127,7 +127,7 @@ public class FactoryReceiver2 extends BroadcastReceiver{
 									  Intent i = new Intent();
 									  i.setClassName("cn.com.factorytest", "cn.com.factorytest.MainActivity");
 									  i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-									  Log.e(TAG, "hlm startActivity ageing_time" + ageing_time);
+									  Log.e(TAG, "hlm startActivity FactoryReceiver.ageing_time" + FactoryReceiver.ageing_time);
 									  context.startActivity(i);
 								  }
 								   else{
@@ -135,9 +135,9 @@ public class FactoryReceiver2 extends BroadcastReceiver{
 									  File ageing_file8 = new File(ageing_fullpath8);
 									   if(ageing_file8.exists() && ageing_file8.isFile()){
 										   try {
-											  ageing_flag = 1;
-											  ageing_time = 8;
-										   Log.e(TAG, "hlm Thread.sleep(2000) ageing_flag" + ageing_flag);
+											  FactoryReceiver.ageing_flag = 1;
+											  FactoryReceiver.ageing_time = 8;
+										   Log.e(TAG, "hlm Thread.sleep(2000) FactoryReceiver.ageing_flag" + FactoryReceiver.ageing_flag);
 											  Thread.sleep(20);
 										   } catch (InterruptedException e) {
 											   e.printStackTrace();
@@ -145,7 +145,7 @@ public class FactoryReceiver2 extends BroadcastReceiver{
 										   Intent i = new Intent();
 										   i.setClassName("cn.com.factorytest", "cn.com.factorytest.MainActivity");
 										   i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-										   Log.e(TAG, "hlm startActivity ageing_time" + ageing_time);
+										   Log.e(TAG, "hlm startActivity FactoryReceiver.ageing_time" + FactoryReceiver.ageing_time);
 										   context.startActivity(i);
 									   }
 								  }
