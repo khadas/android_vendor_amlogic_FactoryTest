@@ -87,8 +87,16 @@
 	<string name="IRKeyTest">红外遥控测试</string>
     <string name="KeyTest">按键测试</string>
 	<string name="EnableWol">打开WOL</string>
+	<string name="speaker_MIC">MIC</string>
 	<string name="DisableWol">关闭WOL</string>
-   	
+	<string name="PhoneMictTitle">麦克风测试</string>
+	<string name="PhoneMicSubTitle">请对麦克风说点什么</string>
+	<string name="btnRetest">再次测试</string>
+	<string name="btnSkipText">返回</string>
+	<string name="InsertSdCard">请插入SD卡！</string>
+	<string name="SdCardNospace">SD卡没有空间！</string>
+	<string name="HeadsetRecodrSuccess">录音成功，开始回放！</string>
+    <string name="RecordError">Record error!</string>
     <string name="l1">L1</string>
     <string name="l2">L2</string>
     <string name="r1">R1</string>
@@ -123,5 +131,9 @@
     <string name="n7">7</string>
     <string name="n8">8</string>
     <string name="n9">9</string>
+
+    <string name="s_cpu_thermal">CPU Thermal:</string>
+    <string name="s_cpu_freq">CPU Freq:</string>
+
 
 </resources>

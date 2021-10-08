@@ -37,6 +37,9 @@ public class CHexConver
 	 * @return String 每个Byte之间空格分隔，如: [61 6C 6B]
 	 */  
     public static String str2HexStr(String str){  
+		if(Tools.isGxbaby()){
+			return str;
+		}
         StringBuilder sb = new StringBuilder();
         byte[] bs = str.getBytes();  
         
@@ -54,6 +57,9 @@ public class CHexConver
 	 * @return String 对应的字符串
      */  
     public static String hexStr2Str(String hexStr){
+		if(Tools.isGxbaby()){
+			return hexStr;
+		}
     	hexStr = hexStr.toString().trim().replace(" ", "").toUpperCase(Locale.US);
         char[] hexs = hexStr.toCharArray();  
         byte[] bytes = new byte[hexStr.length() / 2];  
