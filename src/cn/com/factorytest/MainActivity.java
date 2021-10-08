@@ -61,15 +61,33 @@ import java.math.*;
 
 public class MainActivity extends Activity {
 
-	private static final String TAG = Tools.TAG;
-    private static final boolean DISABLED_WRITE_MAC = false;
-	private static final boolean DISABLED_POWER_LED = true;
-	private static final boolean DISABLED_KEY = true;
-	private static final boolean DISABLED_RTC = false;
-	private static final boolean DISABLED_USB2 = false;
-	private static final boolean DISABLED_DEVICE_ID = true;
-	private static final boolean DISABLED_SN  = true;
-    private static boolean ageing_test_ok_flag = false;
+	public static final String TAG = Tools.TAG;
+
+    public static boolean tfcard_test = false;
+	public static boolean usb20_test = false;
+	public static boolean usb30_test = false;
+	public static boolean spi_test = false;
+	public static boolean gsensor_test = false;
+	public static boolean mcu_test = false;
+	public static boolean hdmi_test  = false;
+
+	public static boolean fusb302_test  = false;
+    public static boolean gigabit_test = false;
+	public static boolean lan_test = false;
+	public static boolean wifi_test = false;
+	public static boolean bt_test = false;
+	public static boolean rtc_test = false;
+	public static boolean ageing_test = false;
+
+	public static boolean power_led_test = false;
+	public static boolean irkey_test = false;
+	public static boolean wol_enable  = false;
+	public static boolean mic_test  = false;
+	public static boolean board_key_test  = false;
+	public static boolean reset_mcu  = false;
+	public static boolean wirte_mac  = false;
+
+	private static boolean ageing_test_ok_flag = false;
 
     TextView m_firmware_version;
     TextView m_ddr_size;
@@ -101,13 +119,18 @@ public class MainActivity extends Activity {
     TextView m_TextView_Wifi;
 	TextView m_TextView_BT;
 	TextView m_TextView_Rtc;
+
+	TextView m_TextView_CPU_THERMAL;
+	TextView m_TextView_CPU_FREQ;
     
     Button m_Button_write_mac_usid;
-    TextView m_TextView_NetLed;
     Button m_Button_PowerLed;
 	Button m_Button_Key;
 
     Button m_Button_EnableWol;
+	Button m_Button_IRKey;
+	Button m_Button_reset_MCU;
+	Button m_Button_MIC;
  
 
     Handler mHandler = new FactoryHandler();
@@ -153,6 +176,7 @@ public class MainActivity extends Activity {
 	private final int MSG_GSENSOR_TEST_OK =  115;
 	private final int MSG_AGEING_TEST_ERROR =	116;
 	private final int MSG_AGEING_TEST_OK =  117;	
+	private final int MSG_GET_CPU_STATUS =  118;
     private final int MSG_TIME = 777;
     private static final String nullip = "0.0.0.0";
     private static final String USB_PATH = (Tools.isAndroid5_1_1()?"/storage/udisk":"/storage/external_storage/sd");
@@ -167,7 +191,7 @@ public class MainActivity extends Activity {
     int wifiLevel = 0;
     String usb_path = "";
     LinearLayout mLeftLayout, mBottomLayout ,mBottomLayout2,mBottomLayout3
-    ,mBottomLayout4,mBottomLayout5;
+    ,mBottomLayout4,mBottomLayout5,mBottomLayout6;
     String configFile = "";
     int tag_net = 0;
     int tag_power = 0;
@@ -184,7 +208,7 @@ public class MainActivity extends Activity {
     //系统灯和网络灯测试时间 单位s
     int ledtime = 60;
 	//videoview 全屏播放时间
-    private final long  MSG_PLAY_VIDEO_TIME= 30 * 60 * 1000;
+    private final long  MSG_PLAY_VIDEO_TIME=480 * 30 * 60 * 1000;
 
     private Context mContext;
 	private BTDeviceReceiver mBTDeviceReceiver;
@@ -195,6 +219,7 @@ public class MainActivity extends Activity {
 	private final String BTSSID="Khadas";
 	public static int ageing_flag = 0;
 	public static int ageing_time = 0;
+	public static int ageing_cpu_max = 0;
 
     
     
@@ -203,19 +228,9 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 		mContext = this;
-	Bundle bundle = new Bundle();
-	bundle = getIntent().getExtras();
-	if (bundle != null) {
-		ageing_flag = bundle.getInt("ageing_flag");
-		ageing_time = bundle.getInt("ageing_time");
-	}
-	Log.d(TAG, "ageing_flag ="+ageing_flag+" ageing_time="+ageing_time);
-        mAudioManager = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);    
-        //最大音量    
-        maxVolume = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);    
-        //当前音量    
+        mAudioManager = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
+        maxVolume = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
         currentVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC); 
-        //进入产测apk设置最大音量
         mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, maxVolume, 0); 
         
         m_firmware_version = (TextView)findViewById(R.id.firmware_version_value);
@@ -230,6 +245,9 @@ public class MainActivity extends Activity {
         m_nand_size = (TextView)findViewById(R.id.nand_size_value);
         m_ddr_size = (TextView)findViewById(R.id.ddr_size_value);
         
+		m_TextView_CPU_THERMAL = (TextView)findViewById(R.id.cpu_thermal_value);
+        m_TextView_CPU_FREQ = (TextView)findViewById(R.id.cpu_freq_value);
+
         m_TextView_Time = (TextView)findViewById(R.id.TextView_Time);
         m_TextView_TF = (TextView)findViewById(R.id.TextView_TF);
         m_TextView_USB1 = (TextView)findViewById(R.id.TextView_USB1);
@@ -247,70 +265,104 @@ public class MainActivity extends Activity {
         m_TextView_Wifi = (TextView)findViewById(R.id.TextView_Wifi);
 		m_TextView_BT = (TextView)findViewById(R.id.TextView_BT);
 		m_TextView_Rtc = (TextView)findViewById(R.id.TextView_Rtc);
-		if(DISABLED_RTC) {
-	    m_TextView_Rtc.setVisibility(View.GONE);
-		}
+		m_Button_write_mac_usid = (Button)findViewById(R.id.Button_Writemac);
+		m_Button_PowerLed = (Button)findViewById(R.id.Button_PowerLed);
+		m_Button_Key = (Button)findViewById(R.id.KeyTest);
+		m_Button_EnableWol = (Button)findViewById(R.id.EnableWol);
+		m_Button_IRKey = (Button)findViewById(R.id.IRKeyTest);
+		m_Button_reset_MCU = (Button)findViewById(R.id.Button_RstMcu);
+		m_Button_MIC = (Button)findViewById(R.id.speaker_MIC);
 
-		if(DISABLED_USB2) {
-			m_TextView_USB2.setVisibility(View.GONE);
-		}
-
-		if(DISABLED_DEVICE_ID) {
-			m_device_id.setVisibility(View.GONE);
-		}
-
-		if(DISABLED_SN) {
-			m_snvalue.setVisibility(View.GONE);
-		}
-
-        if (Build.MODEL.equals("VIM1") || Build.MODEL.equals("VIM2")) {
-            m_TextView_GSENSOR.setVisibility(View.GONE);
-            m_TextView_FUSB302.setVisibility(View.GONE);
-        }
-
-        m_maccheck = (EditText)findViewById(R.id.EditTextMac); 
+		m_maccheck = (EditText)findViewById(R.id.EditTextMac);
         m_maccheck.setInputType(InputType.TYPE_NULL);
         m_maccheck.addTextChangedListener(mTextWatcher);
         m_mactitle = (TextView)findViewById(R.id.MacTitle);
-        
-        m_Button_write_mac_usid = (Button)findViewById(R.id.Button_Writemac);
-		if (Build.MODEL.equals("VIM2") || Build.MODEL.equals("VIM3") || Build.MODEL.equals("VIM3L")) {
-			if(DISABLED_WRITE_MAC) {
-				m_Button_write_mac_usid.setVisibility(View.GONE);
-			}
-		} else {
+
+		if(!irkey_test) {
+			m_Button_IRKey.setVisibility(View.GONE);
+		}
+
+		if(!mic_test) {
+			m_Button_MIC.setVisibility(View.GONE);
+		}
+
+		if(!reset_mcu) {
+			m_Button_reset_MCU.setVisibility(View.GONE);
+		}
+
+		if(!mcu_test) {
+			m_TextView_MCU.setVisibility(View.GONE);
+		}
+
+		if(!ageing_test) {
+			m_TextView_AGEING.setVisibility(View.GONE);
+		}
+		if(!rtc_test) {
+			m_TextView_Rtc.setVisibility(View.GONE);
+		}
+
+		if(!usb20_test) {
+			m_TextView_USB1.setVisibility(View.GONE);
+		}
+
+		if(!usb30_test) {
+			m_TextView_USB2.setVisibility(View.GONE);
+		}
+
+		if(!tfcard_test) {
+			m_TextView_TF.setVisibility(View.GONE);
+		}
+		if(!gsensor_test) {
+			m_TextView_GSENSOR.setVisibility(View.GONE);
+		}
+
+		if(!fusb302_test) {
+			m_TextView_FUSB302.setVisibility(View.GONE);
+		}
+		if(!hdmi_test) {
+			m_TextView_HDMI.setVisibility(View.GONE);
+		}
+		if(!wirte_mac) {
 			m_Button_write_mac_usid.setVisibility(View.GONE);
 		}
-        m_Button_PowerLed = (Button)findViewById(R.id.Button_PowerLed);
-        m_TextView_NetLed = (TextView)findViewById(R.id.Button_NetLed);
-        if (Build.MODEL.equals("VIM2") || Build.MODEL.equals("VIM3") || Build.MODEL.equals("VIM3L"))
-           m_TextView_NetLed.setText(getResources().getString(R.string.Led_white_Test));
-        else {
-            m_TextView_NetLed.setText(getResources().getString(R.string.Led_red_Test));
-            if (Build.MODEL.equals("VIM1"))
-                m_TextView_NetLed.setVisibility(View.GONE);
-        }
 
-		if(DISABLED_POWER_LED) {
-        m_Button_PowerLed.setVisibility(View.GONE);
+		if(!power_led_test) {
+			m_Button_PowerLed.setVisibility(View.GONE);
 		}
 
-		m_Button_Key = (Button)findViewById(R.id.KeyTest);
-		if(DISABLED_KEY) {
-        m_Button_Key.setVisibility(View.GONE);
+		if(!board_key_test) {
+			m_Button_Key.setVisibility(View.GONE);
 		}
-        
-        m_Button_EnableWol = (Button)findViewById(R.id.EnableWol);
-         if (Build.MODEL.equals("VIM2") || Build.MODEL.equals("VIM3") || Build.MODEL.equals("VIM3L")) {
-                m_TextView_SPI.setVisibility(View.VISIBLE);
-		m_TextView_Gigabit.setVisibility(View.VISIBLE);
-        }
+		if(!wol_enable) {
+			m_Button_EnableWol.setVisibility(View.GONE);
+		}
+		if(!spi_test) {
+			m_TextView_SPI.setVisibility(View.GONE);
+		}
+
+		if(!gigabit_test) {
+			m_TextView_Gigabit.setVisibility(View.GONE);
+		}
+
+		if(!wifi_test) {
+			m_TextView_Wifi.setVisibility(View.GONE);
+		}
+
+		if(!bt_test) {
+			m_TextView_BT.setVisibility(View.GONE);
+		}
+
+		if(!lan_test) {
+			m_TextView_Lan.setVisibility(View.GONE);
+		}
+
         mLeftLayout = (LinearLayout) findViewById(R.id.Layout_Left);
         mBottomLayout = (LinearLayout) findViewById(R.id.Layout_Bottom);
         mBottomLayout2 = (LinearLayout) findViewById(R.id.Layout_Bottom2);
         mBottomLayout3 = (LinearLayout) findViewById(R.id.Layout_Bottom3);
         mBottomLayout4 = (LinearLayout) findViewById(R.id.Layout_Bottom4);
         mBottomLayout5 = (LinearLayout) findViewById(R.id.Layout_Bottom5);
+		mBottomLayout6 = (LinearLayout) findViewById(R.id.Layout_Bottom6);
 		
 		mWifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
 		mWifiManager.setWifiEnabled(true);
@@ -318,151 +370,127 @@ public class MainActivity extends Activity {
         updateTime();
         new Thread() {
             public void run() {
-                test_Thread();
+
+				if(ageing_test){
+					test_cpu_ageing();
+				}
+
+				while (true) {
+					try {
+						test_Thread();
+						Thread.sleep(10 * 1000);
+                    } catch (Exception localException1) {
+
+					}
+
+				}
             }
         }.start();
-        //if (Build.MODEL.equals("VIM3") || Build.MODEL.equals("VIM3L") || Build.MODEL.equals("VIM1")) {
-            new Thread() {
-                public void run() {
-                    while (true) {
-                        try {
-							if(0 == ageing_flag){
-	                            Tools.writeFile(Tools.Red_Led, "2");
-	                            Tools.writeFile(Tools.White_Led, "default-on");
-	                            Thread.sleep(1000);
-	                            Tools.writeFile(Tools.White_Led, "off");
-	                            Tools.writeFile(Tools.Red_Led, "1");
-	                            Thread.sleep(1000);
-							}
-							else
-								test_cpu_ageing();	
-							if(2 == VideoFragment.ageing_test_step && !ageing_test_ok_flag){
-								mHandler.sendEmptyMessage(MSG_AGEING_TEST_OK);
-								ageing_test_ok_flag = true;
-							}
-							else if(1 == VideoFragment.ageing_test_step && ageing_test_ok_flag){
-								mHandler.sendEmptyMessage(MSG_AGEING_TEST_ERROR);
-								ageing_test_ok_flag = false;
-							}														
-                        } catch (Exception localException1) {
 
-                        }
+		new Thread() {
+			public void run() {
+				while (true) {
+					try {
+						mHandler.sendEmptyMessage(MSG_GET_CPU_STATUS);
+						Thread.sleep(1000);
+                    } catch (Exception localException1) {
                     }
                 }
-            }.start();
-       // }
+			}
+		}.start();
     }
  
     public void test_Thread() {
 		test_AGEING();
         test_volumes();
         test_ETH();
-		test_rtc();
         test_BT();
         test_RTC();
         test_MCU();
-        if (Build.MODEL.equals("VIM3") || Build.MODEL.equals("VIM3L")) {
-            test_FUSB302();
-            test_GSENSOR();
-        }
+        test_FUSB302();
+        test_GSENSOR();
         test_HDMI();
         test_Gigabit();
-        if (Build.MODEL.equals("VIM2") || Build.MODEL.equals("VIM3") || Build.MODEL.equals("VIM3L"))
-            test_SPI();
-        boolean bWifiOk = false;
-
-            for (int i = 0; i < 10; i++) {
-                if (test_Wifi()) {
-                    bWifiOk = true;
-                    break;
-                }
-            }
-
-		if(bWifiOk){	
-			mHandler.sendEmptyMessage(MSG_WIFI_TEST_OK);
-        }else{
-            mHandler.sendEmptyMessage(MSG_WIFI_TEST_ERROR);
-        }
+        test_SPI();
+		test_Wifi();
 
     }
 	
-private void registerBTReceiver(){
+	private void registerBTReceiver(){
 
-	mBTDeviceReceiver = new BTDeviceReceiver();
-	IntentFilter filter=new IntentFilter();
-	filter.addAction(BluetoothDevice.ACTION_FOUND);
-	filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
-	mContext.registerReceiver(mBTDeviceReceiver,filter);
-	Log.d(TAG, "registerBTReceiver");
-}
-private class BTDeviceReceiver extends BroadcastReceiver{
+		mBTDeviceReceiver = new BTDeviceReceiver();
+		IntentFilter filter=new IntentFilter();
+		filter.addAction(BluetoothDevice.ACTION_FOUND);
+		filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
+		mContext.registerReceiver(mBTDeviceReceiver,filter);
+		Log.d(TAG, "registerBTReceiver");
+	}
 
-	@Override
-	public void onReceive(Context context, Intent intent) {
-		String action =intent.getAction();
-		if(BluetoothDevice.ACTION_FOUND.equals(action)){
-			BluetoothDevice btd=intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-			short rssi = intent.getExtras().getShort(BluetoothDevice.EXTRA_RSSI);
-			if(btd!=null){
-				String name = btd.getName();
-				if(name!=null){
-					if(name.equals(BTSSID)){
-						if(rssi>CONFIG_BT_RSSI){
-							btLevel = -rssi;
-							BT_ERR = false;
-							mHandler.sendEmptyMessage(MSG_BT_TEST_OK);
-						}else {
-                   			BT_ERR = true;
+	private class BTDeviceReceiver extends BroadcastReceiver{
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			String action =intent.getAction();
+			if(BluetoothDevice.ACTION_FOUND.equals(action)){
+				BluetoothDevice btd=intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+				short rssi = intent.getExtras().getShort(BluetoothDevice.EXTRA_RSSI);
+				if(btd!=null){
+					String name = btd.getName();
+					if(name!=null){
+						if(name.equals(BTSSID)){
+							if(rssi>CONFIG_BT_RSSI){
+								btLevel = -rssi;
+								BT_ERR = false;
+								mHandler.sendEmptyMessage(MSG_BT_TEST_OK);
+							}else {
+								BT_ERR = true;
+							}
 						}
+						Log.d(TAG,"BT Found device name= "+btd.getName()+"rssi = "+rssi);
 					}
-				   Log.d(TAG,"BT Found device name= "+btd.getName()+"rssi = "+rssi);
 				}
+			}else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
+				if(BT_ERR){
+					BT_try_count--;
+					if(BT_try_count>0) {
+						test_BT();
+					}
+					if(BT_try_count<=0){
+						mHandler.sendEmptyMessage(MSG_BT_TEST_ERROR);
+					}
+				}
+				Log.d(TAG,"BT Found End");
 			}
-		}else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
-
-			  if(BT_ERR){
-
-				  BT_try_count--;
-				  if(BT_try_count>0) {
-				  test_BT();
-				  }
-				  if(BT_try_count<=0){
-                  mHandler.sendEmptyMessage(MSG_BT_TEST_ERROR);
-				  }
-			  }
-
-		    Log.d(TAG,"BT Found End");
 		}
 	}
-}
 
 
-private void updateEthandWifi(){
-    boolean isEthConnected = NetworkUtils.isEthConnected(this);
-    
-    if (isEthConnected) {
-    	m_ip.setText(NetworkUtils.getLocalIpAddress(this));
-    }else{
-    	m_ip.setText(nullip);
-    }
-    
-    WifiManager manager = (WifiManager) this.getSystemService(Context.WIFI_SERVICE);
-    DhcpInfo dhcpInfo = manager.getDhcpInfo();
-    WifiInfo wifiinfo = manager.getConnectionInfo();
-    if (wifiinfo != null) {
-    	m_wifiip.setText(NetworkUtils.int2ip(wifiinfo.getIpAddress()));
-    	m_wifimac.setText(wifiinfo.getMacAddress());
-    }else{
-    	m_wifiip.setText(nullip);
-    	m_wifimac.setText(" ");
-    }
-}
+	private void updateEthandWifi(){
+		boolean isEthConnected = NetworkUtils.isEthConnected(this);
+
+		if (isEthConnected) {
+			m_ip.setText(NetworkUtils.getLocalIpAddress(this));
+		}else{
+			m_ip.setText(nullip);
+		}
+
+		WifiManager manager = (WifiManager) this.getSystemService(Context.WIFI_SERVICE);
+		DhcpInfo dhcpInfo = manager.getDhcpInfo();
+		WifiInfo wifiinfo = manager.getConnectionInfo();
+		if (wifiinfo != null) {
+			m_wifiip.setText(NetworkUtils.int2ip(wifiinfo.getIpAddress()));
+			m_wifimac.setText(wifiinfo.getMacAddress());
+		}else{
+			m_wifiip.setText(nullip);
+			m_wifimac.setText(" ");
+		}
+	}
     
     @Override
     protected void onResume()
     {
         super.onResume();
-      //  readVersion();
+		//readVersion();
         
         m_ddr_size.setText((Tools.getmem_TOLAL()*100/1024/1024/100.0)+" GB");
         m_nand_size.setText(Tools.getRomSize(this));
@@ -548,30 +576,36 @@ private void updateEthandWifi(){
 
 
     public void PowerLed_Test(View view){
-        Log.e(TAG, "PowerLed_Test()");
+		Log.d(TAG, "PowerLed_Test()");
         m_Button_PowerLed.setTag(0);
         mHandler.removeMessages(MSG_POWERLED_TEST_Start);
         mHandler.sendEmptyMessage(MSG_POWERLED_TEST_Start);
     }
 
     public void rst_mcu(View view){
-        Log.e(TAG, "rst_mcu()");
+		Log.d(TAG, "rst_mcu()");
         Tools.writeFile(Tools.White_Led,"off");
         Tools.writeFile(Tools.Red_Led,"off");
         Tools.writeFile("/sys/class/mcu/rst", "0");
     }
 
     public void Write_mac_usid(View view){
-    	 Log.e(TAG, "Write_mac_usid()");
+		Log.d(TAG, "Write_mac_usid()");
     	 m_Button_write_mac_usid.setTag(0);
     	 Intent intent = new Intent(this, WriteMacActivity.class);
     	 startActivity(intent);
     }
     
     public void IRKeyTest(View view){
-    	 Log.e(TAG, "IRKeyTest()");
-   	 Intent intent = new Intent(this, IRKeyTestActivity.class);
-	 startActivity(intent);
+		Log.d(TAG, "IRKeyTest()");
+		Intent intent = new Intent(this, IRKeyTestActivity.class);
+		startActivity(intent);
+	}
+
+	public void speaker_MIC(View view){
+		Log.d(TAG, "speaker_MIC()");
+		Intent intent = new Intent(this, PhoneMicTestActivity.class);
+		startActivity(intent);
     }
 
 	public void EnableWol(View view){
@@ -580,52 +614,55 @@ private void updateEthandWifi(){
 	}
 
 
-   public void KeyTest(View view){
-         Log.e(TAG, "KeyTest()");
+	public void KeyTest(View view){
+		Log.e(TAG, "KeyTest()");
+	}
 
+	private void test_BT(){
+		try {
+			Thread.sleep(1000);
+		}catch(Exception localException1){
+		}
 
-  }
+		BTAdmin localBTAdmin = new BTAdmin();
+		registerBTReceiver();
+		localBTAdmin.OpenBT();
+		if(!localBTAdmin.ScanBT()){
+			mHandler.sendEmptyMessage(MSG_BT_TEST_ERROR);
+		}
+	}
 
-   private void test_BT(){
-         
-      try {
-		  Thread.sleep(1000);
-	  }catch(Exception localException1){
+	private void test_SPI() {
+		String val = Tools.readFile("/proc/cmdline");
+		if (val.indexOf("spi_state=1") != -1)
+			mHandler.sendEmptyMessage(MSG_SPI_TEST_OK);
+		else
+			mHandler.sendEmptyMessage(MSG_SPI_TEST_ERROR);
+	}
 
-	  }
+	private void test_FUSB302() {
+		try {
+			String rec = Tools.execCommand(new String[]{"sh", "-c", "i2cdump -f -y 6 0x22"});
+			if (!rec.contains("i2cdump:"))
+				mHandler.sendEmptyMessage(MSG_FUSB302_TEST_OK);
+			else
+				mHandler.sendEmptyMessage(MSG_FUSB302_TEST_ERROR);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 
-	  BTAdmin localBTAdmin = new BTAdmin();
-	  registerBTReceiver();
-	  localBTAdmin.OpenBT();
-	  if(!localBTAdmin.ScanBT()){
-       mHandler.sendEmptyMessage(MSG_BT_TEST_ERROR);
-	  }
-   }
-
-  private void test_SPI() {
-       String val = Tools.readFile("/proc/cmdline");
-       if (val.indexOf("spi_state=1") != -1)
-          mHandler.sendEmptyMessage(MSG_SPI_TEST_OK);
-       else
-          mHandler.sendEmptyMessage(MSG_SPI_TEST_ERROR);
-  }
-
-  private void test_FUSB302() {
-       String val = Tools.readFile("/proc/cmdline");
-       if (val.indexOf("fusb302_state=1") != -1)
-          mHandler.sendEmptyMessage(MSG_FUSB302_TEST_OK);
-       else
-          mHandler.sendEmptyMessage(MSG_FUSB302_TEST_ERROR);
-  }
-    
-  private void test_MCU() {
-
-        File file = new File("/sys/class/mcu/rst");
-        if (file.exists())
-            mHandler.sendEmptyMessage(MSG_MCU_TEST_OK);
-        else
-            mHandler.sendEmptyMessage(MSG_MCU_TEST_ERROR);
-  }
+	private void test_MCU() {
+		try {
+			String rec = Tools.execCommand(new String[]{"sh", "-c", "i2cdump -f -y 6 0x18"});
+			if (!rec.contains("i2cdump:"))
+				mHandler.sendEmptyMessage(MSG_MCU_TEST_OK);
+			else
+				mHandler.sendEmptyMessage(MSG_MCU_TEST_ERROR);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 
   private void test_HDMI() {
 
@@ -643,49 +680,41 @@ private void updateEthandWifi(){
             mHandler.sendEmptyMessage(MSG_HDMI_TEST_ERROR);
   }
 
-  private void test_GSENSOR() {
-	int num = 10;
-        String path = "/sys/class/input/";
-	String node = "";
-	for (int i =0; i< num; i++) {
-		node = path + "input" + i + "/name";
-		File file = new File(node);
-		if (!file.exists())
-			continue;
-		String value = Tools.readFile(node);
-		if (value.equals("gsensor")) {
-			 mHandler.sendEmptyMessage(MSG_GSENSOR_TEST_OK);
-			 return;
+	private void test_GSENSOR() {
+		try {
+			String rec = Tools.execCommand(new String[]{"sh", "-c", "i2cdump -f -y 6 0x0E"});
+			if (!rec.contains("i2cdump:"))
+				mHandler.sendEmptyMessage(MSG_GSENSOR_TEST_OK);
+			else
+				mHandler.sendEmptyMessage(MSG_GSENSOR_TEST_ERROR);
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
-	mHandler.sendEmptyMessage(MSG_GSENSOR_TEST_ERROR);
-  }
 
-  private void test_AGEING() {
-      String pathname = "/sys/class/mcu/ageing_test";
-	try (FileReader reader = new FileReader(pathname);
-		 BufferedReader br = new BufferedReader(reader)) {
-		String line;
-		while ((line = br.readLine()) != null) {
-			int id = Integer.parseInt(line);
-			Log.d(TAG, "hlm AGEING: " + id);
-			if(1==id){
-				ageing_test_ok_flag = true;
-				mHandler.sendEmptyMessage(MSG_AGEING_TEST_OK);	
-				return;
-			}					
-		}		
-	} catch (IOException e) {
-		e.printStackTrace();
-	}
-	ageing_test_ok_flag = false;
-	if(0 == ageing_flag)
-		m_TextView_AGEING.setVisibility(View.GONE);
-	else
+
+	private void test_AGEING() {
+		String pathname = "/sys/class/mcu/ageing_test";
+		try (FileReader reader = new FileReader(pathname);
+			BufferedReader br = new BufferedReader(reader)) {
+			String line;
+			while ((line = br.readLine()) != null) {
+				int id = Integer.parseInt(line);
+				Log.d(TAG, "hlm AGEING: " + id);
+				if(1==id){
+					ageing_test_ok_flag = true;
+					mHandler.sendEmptyMessage(MSG_AGEING_TEST_OK);
+					return;
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		ageing_test_ok_flag = false;
 		mHandler.sendEmptyMessage(MSG_AGEING_TEST_ERROR);
-  }
+	}
 
-  private void test_Gigabit() {
+	private void test_Gigabit() {
 
         String node = "/sys/class/net/eth0/speed";
         File file = new File(node);
@@ -698,32 +727,28 @@ private void updateEthandWifi(){
         }
         else
             mHandler.sendEmptyMessage(MSG_GIGABIT_TEST_ERROR);
-  }
+	}
 	
-  private void test_RTC() {
-	String content = "";
+	private void test_RTC() {
+		String content = "";
         String node = "/sys/class/rtc/rtc0/time";
         File file = new File(node);
         if (file.exists()) {
             String val = Tools.readFile(node);
             try {
                 FileInputStream instream = new FileInputStream(node);
-                if(instream != null)
-                {
+                if(instream != null){
                     InputStreamReader inputreader = new InputStreamReader(instream);
                     BufferedReader buffreader = new BufferedReader(inputreader);
                     Log.d(TAG, "buffreader = " + buffreader.toString());
                     String line;
-                    while( (line = buffreader.readLine() )  !=  null)
-                    {
+                    while( (line = buffreader.readLine() )  !=  null){
                         content = content + line;
-
                     }
                     instream.close();
                  }
-              } catch(FileNotFoundException e)
-              {
-                 Log.e(TAG, "The File doesn\'t not exist.");
+              } catch(FileNotFoundException e){
+                 Log.e(TAG, "test_RTC The File doesn\'t not exist.");
                  mHandler.sendEmptyMessage(MSG_RTC_TEST_ERROR);
               } catch(IOException e) {
                  Log.e(TAG, " readFile error!");
@@ -735,68 +760,97 @@ private void updateEthandWifi(){
         }
         else
             mHandler.sendEmptyMessage(MSG_RTC_TEST_ERROR);
-  }
+	}
 
-      private void test_cpu_ageing()
-    {
-	  	BigDecimal a = new BigDecimal("1");
-		BigDecimal b = new BigDecimal("7");
-		System.out.println("1/7 =" + a.divide(b, 100, RoundingMode.HALF_UP));
-    }
-	  
-    private boolean test_Wifi()
-    {
+	private void test_cpu_ageing(){
 
-        boolean bWifiScaned = false;
-                try {
-                    Thread.sleep(2000);
-                }
-                catch(Exception localException1)
-                {
-                }
-                configSSID =  getResources().getString(R.string.config_ap_ssid);
-                WifiAdmin  localWifiAdmin  =  new WifiAdmin (this);
-                localWifiAdmin.openWifi();
-                localWifiAdmin.startScan();
-                wifiList = new ArrayList<ScanResult>();
-                
-                wifiList = localWifiAdmin.getWifiList();
-               
-                Log.d(TAG, "wifi size: " + wifiList.size());
-                if (wifiList != null) {
-                    for (ScanResult result : wifiList) {
-                        if(result.SSID.equals(configSSID)){
-                            wifiLevel = WifiManager.calculateSignalLevel(result.level, 100);
-                            Log.d(TAG, "wifiLevel: " + wifiLevel);
-                            if(wifiLevel >= configLevel)
-                            {
-                                bWifiScaned = true;
-                            }
-                        }
-                    }
+		String shpath=copyAssetGetFilePath("test_cpu_ageing.sh");
 
-                 }
-//        boolean bWifiScaned = false;
-//        WifiAdmin  localWifiAdmin  =  new WifiAdmin (this);
-//        localWifiAdmin.openWifi();
-//        localWifiAdmin.startScan();
-//        List<ScanResult> wifiList = localWifiAdmin.getWifiList();
-//
-//        if (wifiList != null) {
-//            for (ScanResult result : wifiList) {
-//                if(result.SSID.equals(configSSID)){
-//                    wifiLevel = WifiManager.calculateSignalLevel(result.level, 100);
-//                    if(wifiLevel >= configLevel)
-//                    {
-//                        bWifiScaned = true;
-//                    }
-//                }
-//            }
-//        }
+		Log.d(TAG, "===shpath===="+ shpath);
 
+		File file = new File(shpath);
+		if(file.exists()){
+			try {
+				Tools.execCommand(new String[]{"sh", "-c", "chmod 777 " + shpath});
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 
-        return bWifiScaned;
-    }
+		for (int i =0; i < ageing_cpu_max; i++) {
+			try {
+				Process ps = Runtime.getRuntime().exec(shpath);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	private String copyAssetGetFilePath(String fileName) {
+		try {
+			File cacheDir = mContext.getCacheDir();
+			if (!cacheDir.exists()) {
+				cacheDir.mkdirs();
+			}
+			File outFile = new File(cacheDir, fileName);
+			if (!outFile.exists()) {
+				boolean res = outFile.createNewFile();
+				if (!res) {
+					return null;
+				}
+			} else {
+				if (outFile.length() > 10) {
+					return outFile.getPath();
+				}
+			}
+			InputStream is = mContext.getAssets().open(fileName);
+			FileOutputStream fos = new FileOutputStream(outFile);
+			byte[] buffer = new byte[1024];
+			int byteCount;
+			while ((byteCount = is.read(buffer)) != -1) {
+				fos.write(buffer, 0, byteCount);
+			}
+			fos.flush();
+			is.close();
+			fos.close();
+			return outFile.getPath();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	private void test_Wifi(){
+		boolean bWifiScaned = false;
+		try {
+			Thread.sleep(2000);
+		}catch(Exception localException1){
+		}
+		configSSID =  getResources().getString(R.string.config_ap_ssid);
+		WifiAdmin  localWifiAdmin  =  new WifiAdmin (this);
+		localWifiAdmin.openWifi();
+		localWifiAdmin.startScan();
+		wifiList = new ArrayList<ScanResult>();
+		wifiList = localWifiAdmin.getWifiList();
+		Log.d(TAG, "wifi size: " + wifiList.size());
+		if (wifiList != null) {
+			for (ScanResult result : wifiList) {
+				if(result.SSID.equals(configSSID)){
+					wifiLevel = WifiManager.calculateSignalLevel(result.level, 100);
+					Log.d(TAG, "wifiLevel: " + wifiLevel);
+					if(wifiLevel >= configLevel){
+						bWifiScaned = true;
+					}
+				}
+			}
+		}
+
+		if(bWifiScaned){
+			mHandler.sendEmptyMessage(MSG_WIFI_TEST_OK);
+		}else{
+			mHandler.sendEmptyMessage(MSG_WIFI_TEST_ERROR);
+		}
+	}
 
 	
 	/**
@@ -810,12 +864,6 @@ private void updateEthandWifi(){
 			test_android6_0();
 		}
 	}
-
-   private void test_rtc() {
-      
-//	   String time = Tools.readFile(Tools.Rtc_time);
-
-   }
 
 	/**
 	 * android6.0 
@@ -1267,7 +1315,7 @@ private void updateEthandWifi(){
 					 break;
                 case MSG_BT_TEST_ERROR:
 				{
-					String strTxt = getResources().getString(R.string.BT_Test) + getResources().getString(R.string.Test_Fail);
+					String strTxt = getResources().getString(R.string.BT_Test) +"    " +  getResources().getString(R.string.Test_Fail);
 					m_TextView_BT.setText(strTxt);
 					m_TextView_BT.setTextColor(0xFFFF5555);
 				}
@@ -1320,6 +1368,7 @@ private void updateEthandWifi(){
                     mBottomLayout3.setVisibility(View.GONE);
                     mBottomLayout4.setVisibility(View.GONE);
                     mBottomLayout5.setVisibility(View.GONE);
+					mBottomLayout6.setVisibility(View.GONE);
                     break;
                 case MSG_TIME:
                 {
@@ -1407,6 +1456,11 @@ private void updateEthandWifi(){
             }
             break;
 				
+			case  MSG_GET_CPU_STATUS:
+				m_TextView_CPU_THERMAL.setText(Tools.readFile(Tools.cpu_thermal));
+				m_TextView_CPU_FREQ.setText("0-3:"+Tools.readFile(Tools.cpu0_cpufreq) + " 4-7: " +
+											Tools.readFile(Tools.cpu4_cpufreq));
+            break;
             }
         }
     }
@@ -1571,7 +1625,7 @@ private void updateEthandWifi(){
                 }
             } catch(FileNotFoundException e) 
             {
-                Log.e(TAG, "The File doesn\'t not exist.");
+                Log.e(TAG, "readVersion The File doesn\'t not exist.");
             } catch(IOException e) {
                 Log.e(TAG, " readFile error!");
                 Log.e(TAG, e.getMessage() );
@@ -1588,6 +1642,7 @@ private void updateEthandWifi(){
         mBottomLayout3.setVisibility(View.VISIBLE);
         mBottomLayout4.setVisibility(View.VISIBLE);
         mBottomLayout5.setVisibility(View.VISIBLE);
+		mBottomLayout6.setVisibility(View.VISIBLE);
         return super.onKeyDown(keyCode, event);
     }
 
