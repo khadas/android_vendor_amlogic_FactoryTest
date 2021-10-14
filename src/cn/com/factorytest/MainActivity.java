@@ -604,7 +604,7 @@ public class MainActivity extends Activity {
 
 	public void speaker_MIC(View view){
 		Log.d(TAG, "speaker_MIC()");
-		Intent intent = new Intent(this, PhoneMicTestActivity.class);
+               Intent intent = new Intent(this, PhoneMicTestActivity.class);
 		startActivity(intent);
     }
 
@@ -653,6 +653,7 @@ public class MainActivity extends Activity {
 	}
 
 	private void test_MCU() {
+		if(Build.MODEL.equals("VIM4")) {
 		try {
 			String rec = Tools.execCommand(new String[]{"sh", "-c", "i2cdump -f -y 6 0x18"});
 			if (!rec.contains("i2cdump:"))
@@ -662,6 +663,15 @@ public class MainActivity extends Activity {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	  }else {
+		   Log.d(TAG,"test_MCU vim1 ");
+		   File file = new File("/sys/class/mcu/rst");
+		   if (file.exists())
+		   mHandler.sendEmptyMessage(MSG_MCU_TEST_OK);
+	           else
+	           mHandler.sendEmptyMessage(MSG_MCU_TEST_ERROR);
+
+	  }
 	}
 
   private void test_HDMI() {
@@ -1458,8 +1468,12 @@ public class MainActivity extends Activity {
 				
 			case  MSG_GET_CPU_STATUS:
 				m_TextView_CPU_THERMAL.setText(Tools.readFile(Tools.cpu_thermal));
+				if(Build.MODEL.equals("VIM4")) {
 				m_TextView_CPU_FREQ.setText("0-3:"+Tools.readFile(Tools.cpu0_cpufreq) + " 4-7: " +
 											Tools.readFile(Tools.cpu4_cpufreq));
+				} else {
+                                m_TextView_CPU_FREQ.setText(Tools.readFile(Tools.cpu0_cpufreq));
+				}
             break;
             }
         }
@@ -1641,8 +1655,8 @@ public class MainActivity extends Activity {
         mBottomLayout2.setVisibility(View.VISIBLE);
         mBottomLayout3.setVisibility(View.VISIBLE);
         mBottomLayout4.setVisibility(View.VISIBLE);
-        mBottomLayout5.setVisibility(View.VISIBLE);
-		mBottomLayout6.setVisibility(View.VISIBLE);
+        //mBottomLayout5.setVisibility(View.VISIBLE);
+	mBottomLayout6.setVisibility(View.VISIBLE);
         return super.onKeyDown(keyCode, event);
     }
 
