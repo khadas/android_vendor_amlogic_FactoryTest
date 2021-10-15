@@ -379,6 +379,7 @@ public class MainActivity extends Activity {
 					try {
 						test_Thread();
 						Thread.sleep(10 * 1000);
+                                                unregisterBTReceiver();
                     } catch (Exception localException1) {
 
 					}
@@ -425,6 +426,15 @@ public class MainActivity extends Activity {
 		mContext.registerReceiver(mBTDeviceReceiver,filter);
 		Log.d(TAG, "registerBTReceiver");
 	}
+
+        private void unregisterBTReceiver() {
+            Log.d(TAG, "[unregisterBTReceiver]BTReceiver");
+            if (mBTDeviceReceiver != null) {
+                unregisterReceiver (mBTDeviceReceiver);
+                mBTDeviceReceiver = null;
+            }
+        }
+
 
 	private class BTDeviceReceiver extends BroadcastReceiver{
 
