@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item type="id" name="layout">false</item>
+    <item type="id" name="r1">false</item>
+    <item type="id" name="l1">false</item>
+    <item type="id" name="text1">false</item>
+    <item type="id" name="text2">false</item>
+    <item type="id" name="l2">false</item>
+    <item type="id" name="r2">false</item>
+    <item type="id" name="up">false</item>
+    <item type="id" name="left">false</item>
+    <item type="id" name="down">false</item>
+    <item type="id" name="right">false</item>
+    <item type="id" name="button_y">false</item>
+    <item type="id" name="button_x">false</item>
+    <item type="id" name="button_b">false</item>
+    <item type="id" name="button_a">false</item>
+    <item type="id" name="f12">false</item>
+    <item type="id" name="vs">false</item>
+    <item type="id" name="va">false</item>
+    <item type="id" name="button_select">false</item>
+    <item type="id" name="menu">false</item>
+    <item type="id" name="mute">false</item>
+    <item type="id" name="button_start">false</item>
+    <item type="id" name="back">false</item>
+    <item type="id" name="action_settings">false</item>
+    <item type="id" name="n0">false</item>
+    <item type="id" name="n1">false</item>
+    <item type="id" name="n2">false</item>
+    <item type="id" name="n3">false</item>
+    <item type="id" name="n4">false</item>
+    <item type="id" name="n5">false</item>
+    <item type="id" name="n6">false</item>
+    <item type="id" name="n7">false</item>
+    <item type="id" name="n8">false</item>
+    <item type="id" name="n9">false</item>
+</resources>
