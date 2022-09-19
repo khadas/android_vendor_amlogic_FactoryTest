@@ -48,7 +48,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:text="@string/TF_Test"
-            android:textSize="20sp"
+            android:textSize="15sp"
             android:textColor="#FF5555FF">
         </TextView>
 
@@ -58,7 +58,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:text="@string/SPIFLASH_Test"
-            android:textSize="20sp"
+            android:textSize="15sp"
             android:textColor="#FF5555FF">
         </TextView>
 	
@@ -69,7 +69,7 @@
             android:layout_height="match_parent"
             android:textColor="#FF5555FF"
             android:text="@string/USB1_Test"
-            android:textSize="20sp" >
+            android:textSize="15sp" >
         </TextView>
 
         <TextView
@@ -78,7 +78,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:text="@string/USB2_Test"
-            android:textSize="20sp"
+            android:textSize="15sp"
             android:textColor="#FF5555FF" >
         </TextView>
 
@@ -88,7 +88,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:text="@string/Lan_Test"
-            android:textSize="20sp"
+            android:textSize="15sp"
             android:textColor="#FF5555FF">
         </TextView>
 
@@ -98,7 +98,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:text="@string/Gigabit_network_Test"
-            android:textSize="20sp"
+            android:textSize="15sp"
             android:textColor="#FF5555FF">
         </TextView>
 
@@ -109,7 +109,7 @@
             android:layout_height="match_parent"
             android:textColor="#FF5555FF"
             android:text="@string/BT_Test"
-            android:textSize="20sp" >
+            android:textSize="15sp" >
         </TextView>
 
         <TextView
@@ -119,7 +119,7 @@
             android:layout_height="match_parent"
             android:textColor="#FF5555FF"
             android:text="@string/Wifi_Test"
-            android:textSize="20sp" >
+            android:textSize="15sp" >
         </TextView>
 
         <TextView
@@ -128,7 +128,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:text="@string/MCU_Test"
-            android:textSize="20sp"
+            android:textSize="15sp"
             android:textColor="#FF5555FF">
         </TextView>
 		
@@ -139,7 +139,7 @@
             android:layout_height="match_parent"
             android:textColor="#FF5555FF"
             android:text="@string/HDMI_Test"
-            android:textSize="20sp" >
+            android:textSize="15sp" >
         </TextView>
 
         <TextView
@@ -149,7 +149,7 @@
             android:layout_height="match_parent"
             android:textColor="#FF5555FF"
             android:text="@string/PD12_Test"
-            android:textSize="20sp" >
+            android:textSize="15sp" >
         </TextView>
 						
 	
@@ -160,7 +160,7 @@
             android:layout_height="match_parent"
             android:textColor="#FF5555FF"
             android:text="@string/Gsensor_Test"
-            android:textSize="20sp" >
+            android:textSize="15sp" >
         </TextView>
         <TextView
             android:id="@+id/TextView_Gyro"
@@ -169,7 +169,7 @@
             android:layout_height="match_parent"
             android:textColor="#FF5555FF"
             android:text="@string/Gyro_Test"
-            android:textSize="20sp" >
+            android:textSize="15sp" >
         </TextView>
         <TextView
             android:id="@+id/TextView_Gesture"
@@ -178,7 +178,7 @@
             android:layout_height="match_parent"
             android:textColor="#FF5555FF"
             android:text="@string/Gesture_Test"
-            android:textSize="20sp" >
+            android:textSize="15sp" >
         </TextView>
         <TextView
             android:id="@+id/TextView_Pcie"
@@ -187,7 +187,7 @@
             android:layout_height="match_parent"
             android:textColor="#FF5555FF"
             android:text="@string/Pcie_Test"
-            android:textSize="20sp" >
+            android:textSize="15sp" >
         </TextView>
 	
         <TextView
@@ -197,7 +197,7 @@
             android:layout_height="match_parent"
             android:textColor="#FF5555FF"
             android:text="@string/Charge_Test"
-            android:textSize="20sp" >
+            android:textSize="15sp" >
         </TextView>
 		
         <TextView
@@ -207,7 +207,7 @@
             android:layout_height="match_parent"
             android:textColor="#FF5555FF"
             android:text="@string/Rtc_Test"
-            android:textSize="20sp" >
+            android:textSize="15sp" >
         </TextView>
         <TextView
             android:id="@+id/TextView_AGEING"
@@ -216,7 +216,7 @@
             android:layout_height="match_parent"
             android:textColor="#FF5555FF"
             android:text="@string/AGEING_Test"
-            android:textSize="20sp" >
+            android:textSize="15sp" >
         </TextView>	
         <TextView
             android:visibility="gone"
@@ -225,7 +225,7 @@
             android:layout_height="50dp"
             android:textColor="@android:color/white"
             android:text="@string/mac_check"
-            android:textSize="20sp" >
+            android:textSize="15sp" >
         </TextView>
 
         <EditText
@@ -234,7 +234,7 @@
             android:layout_width="197dp"
             android:layout_height="50dp"
             android:textColor="@android:color/white"
-            android:textSize="20sp" >
+            android:textSize="15sp" >
         </EditText>
 
         <Button
@@ -245,7 +245,7 @@
             android:layout_height="50dp"
             android:textColor="@android:color/white"
             android:text="@string/Led_Test"
-            android:textSize="20sp" >
+            android:textSize="15sp" >
         </Button>
 
         <Button
@@ -256,7 +256,7 @@
             android:layout_height="50dp"
             android:layout_marginTop="20dp"
             android:text="@string/PowerKey_Test"
-            android:textSize="20sp"
+            android:textSize="15sp"
             android:textColor="@android:color/white" >
         </Button>
         
@@ -354,7 +354,7 @@
             android:layout_height="50dp"
             android:layout_marginTop="20dp"
             android:text="@string/DisableWol"
-            android:textSize="20sp"
+            android:textSize="15sp"
             android:textColor="@android:color/white" >
         </Button>
 
