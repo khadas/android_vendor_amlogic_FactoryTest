@@ -378,16 +378,21 @@ public class MainActivity extends Activity {
 				if(0!=i)
 					msg += '\n';
 				msg += line;
+				Log.d(TAG, "line=" + line + "i=" + i);
 				i = 1;
 			}
 			mInputReader.close();
 
-			i = 0;
+			//i = 0;
 			while ((line = mErrorReader.readLine()) != null) {
-				if(0!=i)
-					msg += '\n';
+				//if(0!=i)
+				//	msg += '\n';
 				msg += line;
-				i = 1;
+				Log.d(TAG, "error line=" + line);				
+				Log.d(TAG, "hlm error msg=" + msg + "i=" + i);
+				//i = 1;
+				if (msg.contains("failed") || msg.contains("Error") || msg.contains("No such device")|| msg.contains("Broken pipe")) 
+					return "execSuCmd Error";
 			}
 			mErrorReader.close();
 			mProcess.destroy();
@@ -711,53 +716,59 @@ private void updateEthandWifi(){
   }
 
     private void test_PD() {
-		int usb0,usb1,usb2;
-        String msg = execSuCmd("i2cget -f -y 4 0x22 1");
-		if (msg.contains("failed") || msg.contains("Error")) {
-			usb1=0;
-		}else{
-			usb1=2;
-		}
 
-        String msg0 = execSuCmd("i2cget -f -y 8 0x22 1");
-		if (msg0.contains("failed") || msg0.contains("Error")) {
-			usb0=0;
-		}else{
-			usb0=1;
-		}
-		
-		usb2 = usb1|usb0;
-		Log.d(TAG, "hlm fusb302: " + usb2);
-		if(3 == usb2){
-			mHandler.sendEmptyMessage(MSG_PD12_TEST_OK);	
-		}
-		else if(2 == usb2){
-			mHandler.sendEmptyMessage(MSG_PD1_TEST_ERROR);	
-		}
-		else if(1 == usb2){
-			mHandler.sendEmptyMessage(MSG_PD2_TEST_ERROR);	
-		}
-		else{
-			mHandler.sendEmptyMessage(MSG_PD12_TEST_ERROR);	
+        String pathname2 = "/sys/class/w25q128fw/fusb302";
+		try (FileReader reader2 = new FileReader(pathname2);
+			 BufferedReader br2 = new BufferedReader(reader2)) {
+			String line2;
+			while ((line2 = br2.readLine()) != null) {
+				int usb2 = Integer.parseInt(line2);
+				Log.d(TAG, "hlm fusb302: " + usb2);
+				if(3 == usb2){
+					mHandler.sendEmptyMessage(MSG_PD12_TEST_OK);	
+				}
+				else if(2 == usb2){
+					mHandler.sendEmptyMessage(MSG_PD1_TEST_ERROR);	
+				}
+				else if(1 == usb2){
+					mHandler.sendEmptyMessage(MSG_PD2_TEST_ERROR);	
+				}
+				else{
+					mHandler.sendEmptyMessage(MSG_PD12_TEST_ERROR);	
+				}
+			}		
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
   }
 
   private void test_Charge() {
-        String msg = execSuCmd("i2cget -f -y 8 0x6b 0x6");
-		if (msg.contains("failed") || msg.contains("Error")) {
-			mHandler.sendEmptyMessage(MSG_Charge_TEST_ERROR);
-		}else{
-			mHandler.sendEmptyMessage(MSG_Charge_TEST_OK);
-		}		
+
+        String pathname = "/sys/class/w25q128fw/charge";
+		try (FileReader reader = new FileReader(pathname);
+			 BufferedReader br = new BufferedReader(reader)) {
+			String line;
+			while ((line = br.readLine()) != null) {
+				int id = Integer.parseInt(line);
+				Log.d(TAG, "hlm charge: " + id);
+				if(1==id){
+					mHandler.sendEmptyMessage(MSG_Charge_TEST_OK);	
+					return;
+				}					
+			}		
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		mHandler.sendEmptyMessage(MSG_Charge_TEST_ERROR);			
   }
   
   private void test_MCU() {
-        String msg = execSuCmd("i2cget -f -y 8 0x18 0x6");
-		if (msg.contains("failed") || msg.contains("Error")) {
-			mHandler.sendEmptyMessage(MSG_MCU_TEST_ERROR);
-		}else{
-			mHandler.sendEmptyMessage(MSG_MCU_TEST_OK);
-		}
+
+        File file = new File("/sys/class/wol/enable");
+        if (file.exists())
+            mHandler.sendEmptyMessage(MSG_MCU_TEST_OK);
+        else
+            mHandler.sendEmptyMessage(MSG_MCU_TEST_ERROR);
   }
 
   private void test_SPIFLASH() {
@@ -894,12 +905,11 @@ private void updateEthandWifi(){
    }
 
    private void test_Gesture() {
-        String msg = execSuCmd("i2cget -f -y 8 0x39 0");
-		if (msg.contains("failed") || msg.contains("Error")) {
-			mHandler.sendEmptyMessage(MSG_GESTURE_TEST_ERROR);
-		}else{
-			mHandler.sendEmptyMessage(MSG_GESTURE_TEST_OK);
-		} 
+        File file = new File("/sys/kernel/debug/regmap/8-0039-apds9960_regmap");
+        if (file.exists())
+            mHandler.sendEmptyMessage(MSG_GESTURE_TEST_OK);
+        else
+            mHandler.sendEmptyMessage(MSG_GESTURE_TEST_ERROR);
    }
 	
    private void test_Pcie() {
