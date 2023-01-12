@@ -66,28 +66,6 @@ public class Tools {
 	private static boolean mEfuseFlag = false;
 	public static  final String ageing_status = "/sys/class/mcu/ageing_test";  
 
-	public static String execCommand(String[] command) throws IOException {
-        // start the ls command running
-        //String[] args =  new String[]{"sh", "-c", command};
-        Runtime runtime = Runtime.getRuntime();
-        Process proc = runtime.exec(command);
-        InputStream inputstream = proc.getInputStream();
-        InputStreamReader inputstreamreader = new InputStreamReader(inputstream);
-        BufferedReader bufferedreader = new BufferedReader(inputstreamreader);
-        String line = "";
-        String sb = "";
-        while ((line = bufferedreader.readLine()) != null) {
-            sb = sb + line;
-        }
-        try {
-            if (proc.waitFor() != 0) {
-                System.err.println("exit value = " + proc.exitValue());
-            }
-        } catch (InterruptedException e) {
-            System.err.println(e);
-        }
-        return sb;
-    }
 	public static String readFile(String file)
     {
         String content = "";

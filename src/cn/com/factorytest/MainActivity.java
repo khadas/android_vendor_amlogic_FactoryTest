@@ -737,66 +737,16 @@ private void updateEthandWifi(){
             mHandler.sendEmptyMessage(MSG_RTC_TEST_ERROR);
   }
 
-    private void test_cpu_ageing() {
-
-        String shpath = copyAssetGetFilePath("test_cpu_ageing.sh");
-
-        Log.d(TAG, "===shpath====" + shpath);
-
-        File file = new File(shpath);
-        if (file.exists()) {
-            try {
-                Tools.execCommand(new String[]{"sh", "-c", "chmod 777 " + shpath});
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        for (int i = 0; i < 3; i++) {
-            try {
-                Process ps = Runtime.getRuntime().exec(shpath);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+      private void test_cpu_ageing()
+    {
+	  	BigDecimal a = new BigDecimal("1");
+		BigDecimal b = new BigDecimal("7");
+		System.out.println("1/7 =" + a.divide(b, 100, RoundingMode.HALF_UP));
     }
-
-    private String copyAssetGetFilePath(String fileName) {
-        try {
-            File cacheDir = mContext.getCacheDir();
-            if (!cacheDir.exists()) {
-                cacheDir.mkdirs();
-            }
-            File outFile = new File(cacheDir, fileName);
-            if (!outFile.exists()) {
-                boolean res = outFile.createNewFile();
-                if (!res) {
-                    return null;
-                }
-            } else {
-                if (outFile.length() > 10) {
-                    return outFile.getPath();
-                }
-            }
-            InputStream is = mContext.getAssets().open(fileName);
-            FileOutputStream fos = new FileOutputStream(outFile);
-            byte[] buffer = new byte[1024];
-            int byteCount;
-            while ((byteCount = is.read(buffer)) != -1) {
-                fos.write(buffer, 0, byteCount);
-            }
-            fos.flush();
-            is.close();
-            fos.close();
-            return outFile.getPath();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
+	  
     private boolean test_Wifi()
     {
+
         boolean bWifiScaned = false;
                 try {
                     Thread.sleep(2000);
