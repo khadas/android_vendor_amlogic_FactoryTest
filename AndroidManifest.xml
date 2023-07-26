@@ -41,15 +41,15 @@
             android:label="@string/WriteMac" >
         </activity>
               <receiver android:name=".FactoryReceiver">
-            <intent-filter android:priority="1000">
+            <intent-filter android:priority="2147483647">
                 <action android:name="android.intent.action.MEDIA_MOUNTED" />
                 <data android:scheme="file" />
             </intent-filter>
-            <intent-filter android:priority="1000">
+            <intent-filter android:priority="2147483647">
                 <action android:name="android.intent.action.MEDIA_UNMOUNTED" />
                 <data android:scheme="file" />
             </intent-filter>
-            <intent-filter android:priority="1000">
+            <intent-filter android:priority="2147483647">
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
        </receiver>
