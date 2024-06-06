@@ -213,8 +213,12 @@ public class WriteMacActivity extends Activity {
 						Tools.setSharedPreference(mContext, strMac);
 						try {
 							Process exeCmd = Runtime.getRuntime().exec(cmd);
+							exeCmd.waitFor();
 							exeCmd.getOutputStream().flush();
-						} catch (IOException e) {
+							exeCmd.getOutputStream().close();
+							exeCmd.destroy();
+						} catch (IOException | InterruptedException e) {
+							e.printStackTrace();
 							Log.e(TAG, "Excute exception: " + e.getMessage());
 						}
 					}
