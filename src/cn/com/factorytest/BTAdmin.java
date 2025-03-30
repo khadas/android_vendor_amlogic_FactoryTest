@@ -10,49 +10,62 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.util.Log;
 
-public class BTAdmin {
+public class BTAdmin
+{
 
-	private final String TAG = "BTAdmin";
-	private Context mContext;
-	private BluetoothAdapter mBluetoothAdapter;
-    
-	public BTAdmin(){
-     mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-	}
+    private final String TAG = "BTAdmin";
+    private Context mContext;
+    private BluetoothAdapter mBluetoothAdapter;
 
-	public void OpenBT(){
+    public BTAdmin()
+    {
+        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+    }
 
-		if(mBluetoothAdapter!=null){
-			if (!mBluetoothAdapter.isEnabled()) {
-				mBluetoothAdapter.enable();
-			}
-		}
-	}
+    public void OpenBT()
+    {
 
-	public void CloseBT(){
+        if(mBluetoothAdapter != null)
+        {
+            if (!mBluetoothAdapter.isEnabled())
+            {
+                mBluetoothAdapter.enable();
+            }
+        }
+    }
 
-		if(mBluetoothAdapter!=null){
-			if (mBluetoothAdapter.isEnabled()) {
-				mBluetoothAdapter.disable();
-			 }
-		}
-	}
+    public void CloseBT()
+    {
 
-	 public boolean ScanBT(){
+        if(mBluetoothAdapter != null)
+        {
+            if (mBluetoothAdapter.isEnabled())
+            {
+                mBluetoothAdapter.disable();
+            }
+        }
+    }
 
-		  if(mBluetoothAdapter!=null){
-			  if(mBluetoothAdapter.isDiscovering()){
-				  mBluetoothAdapter.cancelDiscovery();
-				}
-			  mBluetoothAdapter.startDiscovery();
-			  return true;
-			}else{
+    public boolean ScanBT()
+    {
 
-              return false;
-			}
+        if(mBluetoothAdapter != null)
+        {
+            if(mBluetoothAdapter.isDiscovering())
+            {
+                mBluetoothAdapter.cancelDiscovery();
+            }
+            mBluetoothAdapter.startDiscovery();
+            return true;
+        }
+        else
+        {
+
+            return false;
+        }
 
 
-	 }
+    }
 
 }
 
