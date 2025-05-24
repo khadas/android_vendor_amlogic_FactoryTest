@@ -33,7 +33,7 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="350dp"
                 android:layout_weight="1"
                 android:orientation="horizontal">
 
@@ -49,7 +49,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:text="@string/TF_Test"
-                        android:textSize="25sp"
+                        android:textSize="16sp"
                         android:textColor="#FF5555FF">
                     </TextView>
 
@@ -60,7 +60,7 @@
                         android:layout_height="match_parent"
                         android:textColor="#FF5555FF"
                         android:text="@string/USB1_Test"
-                        android:textSize="25sp" >
+                        android:textSize="16sp" >
                     </TextView>
 
                     <TextView
@@ -69,7 +69,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:text="@string/USB2_Test"
-                        android:textSize="25sp"
+                        android:textSize="16sp"
                         android:textColor="#FF5555FF" >
                     </TextView>
 
@@ -80,7 +80,7 @@
                         android:layout_height="match_parent"
                         android:textColor="#FF5555FF"
                         android:text="@string/SPI_Test"
-                        android:textSize="25sp" >
+                        android:textSize="16sp" >
                     </TextView>
 
                     <TextView
@@ -90,7 +90,7 @@
                         android:layout_height="match_parent"
                         android:textColor="#FF5555FF"
                         android:text="@string/Wifi_Test"
-                        android:textSize="25sp" >
+                        android:textSize="16sp" >
                     </TextView>
 
                     <TextView
@@ -100,7 +100,7 @@
                         android:layout_height="match_parent"
                         android:textColor="#FF5555FF"
                         android:text="@string/BT_Test"
-                        android:textSize="25sp" >
+                        android:textSize="16sp" >
                     </TextView>
 
                     <TextView
@@ -110,7 +110,7 @@
                         android:layout_height="match_parent"
                         android:textColor="#FF5555FF"
                         android:text="@string/Led_white_Test"
-                        android:textSize="25sp" >
+                        android:textSize="16sp" >
                     </TextView>
                 </LinearLayout>
 
@@ -127,7 +127,7 @@
                         android:layout_height="match_parent"
                         android:textColor="#FF5555FF"
                         android:text="@string/MCU_Test"
-                        android:textSize="25sp" >
+                        android:textSize="16sp" >
                     </TextView>
 
                     <TextView
@@ -137,7 +137,7 @@
                         android:layout_height="match_parent"
                         android:textColor="#FF5555FF"
                         android:text="@string/HDMI_Test"
-                        android:textSize="25sp" >
+                        android:textSize="16sp" >
                     </TextView>
 
                     <TextView
@@ -147,7 +147,7 @@
                         android:layout_height="match_parent"
                         android:textColor="#FF5555FF"
                         android:text="@string/FUSB302_Test"
-                        android:textSize="25sp" >
+                        android:textSize="16sp" >
                     </TextView>
 
                     <TextView
@@ -157,7 +157,7 @@
                         android:layout_height="match_parent"
                         android:textColor="#FF5555FF"
                         android:text="@string/GSENSOR_Test"
-                        android:textSize="25sp" >
+                        android:textSize="16sp" >
                     </TextView>
 
                     <TextView
@@ -167,7 +167,7 @@
                         android:layout_height="match_parent"
                         android:textColor="#FF5555FF"
                         android:text="@string/Rtc_Test"
-                        android:textSize="25sp" >
+                        android:textSize="16sp" >
                     </TextView>
 
                     <TextView
@@ -176,7 +176,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:text="@string/Lan_Test"
-                        android:textSize="25sp"
+                        android:textSize="16sp"
                         android:textColor="#FF5555FF">
                     </TextView>
 
@@ -186,7 +186,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:text="@string/Gigabit_Test"
-                        android:textSize="25sp"
+                        android:textSize="16sp"
                         android:textColor="#FF5555FF">
                     </TextView>
 
@@ -197,7 +197,7 @@
                         android:layout_height="match_parent"
                         android:textColor="#FF5555FF"
                         android:text="@string/AGEING_Test"
-                        android:textSize="25sp" >
+                        android:textSize="16sp" >
                     </TextView>
 
                     <TextView
@@ -238,7 +238,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/KEY_Test"
-                        android:textSize="25sp"
+                        android:textSize="18sp"
                         android:textColor="#FF5555FF" >
                     </TextView>
 
@@ -250,7 +250,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="1dp"
                         android:text="@string/IRKeyTest"
-                        android:textSize="25sp"
+                        android:textSize="16sp"
                         android:textColor="@android:color/white" >
                     </Button>
 
@@ -262,7 +262,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="1dp"
                         android:text="@string/Mipi_Camera_Test"
-                        android:textSize="25sp"
+                        android:textSize="16sp"
                         android:textColor="@android:color/white">
                     </Button>
 
@@ -274,7 +274,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="1dp"
                         android:text="@string/Mipi_LCD_Test"
-                        android:textSize="25sp"
+                        android:textSize="16sp"
                         android:textColor="@android:color/white">
                     </Button>
 
@@ -286,7 +286,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="1dp"
                         android:text="@string/TP_Test"
-                        android:textSize="25sp"
+                        android:textSize="16sp"
                         android:textColor="@android:color/white">
                     </Button>
 
@@ -296,9 +296,9 @@
                             android:paddingLeft="20dp"
                             android:layout_width="200dp"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="35dp"
+                            android:layout_marginTop="1dp"
                             android:text="@string/WriteMac"
-                            android:textSize="19sp"
+                            android:textSize="16sp"
                             android:textColor="@android:color/white" >
                         </Button>
 
@@ -311,7 +311,7 @@
                             android:layout_marginTop="1dp"
                             android:text="@string/Restore_MCU_settings"
                             android:minHeight="0dp"
-                            android:textSize="20sp"
+                            android:textSize="16sp"
                             android:textColor="@android:color/white" >
                         </Button>
 
@@ -383,8 +383,8 @@
         </LinearLayout>
 
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_width="750dp"
+            android:layout_height="250dp"
             android:layout_weight="1"
             android:layout_marginTop="10dp"
             android:layout_marginRight="0dp"

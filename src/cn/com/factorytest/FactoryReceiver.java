@@ -158,6 +158,7 @@ public class FactoryReceiver extends BroadcastReceiver {
                         new Intent(context, RebootTestActivity.class)
                         .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                     );
+                    return;
                 }
                 if(setTestBoard(rec)){
                    setTestFlags(rec);
@@ -227,7 +228,6 @@ public class FactoryReceiver extends BroadcastReceiver {
         MainActivity.rtc_test = rec.contains("rtc_test=1");
         MainActivity.lan_test = rec.contains("lan_test=1");
         MainActivity.gigabit_test = rec.contains("gigabit_test=1");
-        MainActivity.ageing_test = rec.contains("ageing_test=1");
 
         MainActivity.key_test = rec.contains("key_test=1");
         MainActivity.irkey_test = rec.contains("irkey_test=1");
