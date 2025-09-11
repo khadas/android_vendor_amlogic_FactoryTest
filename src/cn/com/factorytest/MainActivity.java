@@ -2001,14 +2001,21 @@ public class MainActivity extends Activity {
                     }
                 }
             }
+
         }
     };
 
     private void updateTime() {
-        SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy/MM/dd/  E ");
-        SimpleDateFormat sdf2 = new SimpleDateFormat("HH:mm");
-        m_TextView_Time.setText(sdf1.format(new Date()) + sdf2.format(new Date()));
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy/MM/dd/  E ");
+                SimpleDateFormat sdf2 = new SimpleDateFormat("HH:mm");
+                m_TextView_Time.setText(sdf1.format(new Date()) + sdf2.format(new Date()));
+            }
+        });
     }
+
     private void readVersion() {
 
         String lssue = getResources().getString(R.string.lssue_ver);
