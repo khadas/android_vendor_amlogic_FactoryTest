@@ -66,6 +66,11 @@ import java.util.Enumeration;
 import java.net.*;
 import java.math.*;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.view.WindowManager;
+import android.util.DisplayMetrics;
+
 import com.google.gson.Gson;
 import cn.com.factorytest.encoding.EncodingUtils;
 import android.graphics.Bitmap;
@@ -78,6 +83,9 @@ public class MainActivity extends Activity {
 
     public static String test_board = "VIM3";
     public static String udisk_backup = "";
+
+    public static String check_mcu_ver = "";
+    public static String check_fw_ver = "";
 
     public static boolean tfcard_test = false;
     private static boolean tfcard_test_ret = false;
@@ -303,6 +311,7 @@ public class MainActivity extends Activity {
     public static int ageing_time = 0;
     public static int ageing_cpu_max = 0;
     private StatusBarManager mStatusBarManager;
+    private AlertDialog verAlertDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -311,11 +320,11 @@ public class MainActivity extends Activity {
         mContext = this;
         mStatusBarManager = (StatusBarManager) mContext.getSystemService(Context.STATUS_BAR_SERVICE);
         mAudioManager = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
-        //最大音量
+
         maxVolume = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-        //当前音量
+
         currentVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
-        //进入产测apk设置最大音量
+
         mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, maxVolume, 0);
 
         m_TextView_TF = (TextView)findViewById(R.id.TextView_TF);
@@ -506,6 +515,7 @@ public class MainActivity extends Activity {
                 }
             }
         } .start();
+
         //if (Build.MODEL.equals("VIM3") || Build.MODEL.equals("VIM3L") || Build.MODEL.equals("VIM1")) {
         new Thread() {
             public void run() {
@@ -541,7 +551,39 @@ public class MainActivity extends Activity {
         m_ImageView_infoBarCode.setVisibility(View.GONE);
     }
 
+    private void checkVersionInfo() {
+        if ( (!TextUtils.isEmpty(check_mcu_ver) && !check_mcu_ver.equals(getMCUVersion())) ||
+                (!TextUtils.isEmpty(check_fw_ver) && !check_fw_ver.equals(Build.DISPLAY)) ) {
+            if (verAlertDialog == null) {
+
+                String verInfo = getResources().getString(R.string.mcu_version) + getMCUVersion()  + "\n" +
+                                 getResources().getString(R.string.require_mcu_version)  + check_mcu_ver + "\n" +
+                                 getResources().getString(R.string.firmware_version) + Build.DISPLAY  + "\n" +
+                                 getResources().getString(R.string.require_fw_version)  + check_fw_ver + "\n";
+
+                WindowManager windowManager = (WindowManager)getSystemService(Context.WINDOW_SERVICE);
+                DisplayMetrics displayMetrics = new DisplayMetrics();
+                windowManager.getDefaultDisplay().getMetrics(displayMetrics);
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle(R.string.version_error);
+                builder.setMessage(verInfo);
+                builder.setIcon(android.R.drawable.ic_dialog_alert);
+                verAlertDialog = builder.create();
+
+                WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
+                layoutParams.copyFrom(verAlertDialog.getWindow().getAttributes());
+                layoutParams.width = displayMetrics.widthPixels / 3;
+                layoutParams.height = displayMetrics.heightPixels / 3;
+                verAlertDialog.getWindow().setAttributes(layoutParams);
+            }
+            verAlertDialog.show();
+
+        }
+    }
+
     private void checkTestRetUpate() {
+        checkVersionInfo();
 
         Log.d("TESTINFO", "=================================checkTestRetUpate start===========================================");
         Log.d("TESTINFO", "tfcard_test " + tfcard_test +  " tfcard_test_ret " +  tfcard_test_ret + " RET " + (tfcard_test ? (tfcard_test & tfcard_test_ret) : true));
@@ -645,8 +687,9 @@ public class MainActivity extends Activity {
         test_HDMI();
         test_Gigabit();
         test_SPI();
-        if(wifi_test)
+        if(wifi_test) {
             test_Wifi();
+        }
     }
 
     private void registerBTReceiver() {

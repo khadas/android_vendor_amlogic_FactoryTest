@@ -138,5 +138,7 @@
     <string name="n7">7</string>
     <string name="n8">8</string>
     <string name="n9">9</string>
-
+    <string name="version_error">版本出错</string>
+    <string name="require_mcu_version">要求MCU版本 :</string>
+    <string name="require_fw_version">要求固件版本 :</string>
 </resources>

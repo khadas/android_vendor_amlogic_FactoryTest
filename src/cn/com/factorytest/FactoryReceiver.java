@@ -17,22 +17,25 @@ import android.app.Activity;
 import android.content.pm.PackageManager;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 
 import cn.com.factorytest.MainActivity;
 
 public class FactoryReceiver extends BroadcastReceiver {
     private static final String TAG = Tools.TAG;
     private static final String[] UDISK_FILES = {
-            "khadas_test.xml",
-            "khadas_test_n.xml",
-            "khadas_test_mcu.xml",
-            "khadas_test_test.xml",
-            "khadas_test_2.xml",
-            "khadas_test_4.xml",
-            "khadas_test_8.xml",
-            "khadas_test_12.xml",
-            "khadas_test_24.xml",
-            "khadas_test_48.xml"
+        "khadas_test.xml",
+        "khadas_test_n.xml",
+        "khadas_test_mcu.xml",
+        "khadas_test_test.xml",
+        "khadas_test_2.xml",
+        "khadas_test_4.xml",
+        "khadas_test_8.xml",
+        "khadas_test_12.xml",
+        "khadas_test_24.xml",
+        "khadas_test_48.xml"
     };
     private static final int[] AGEING_TIMES = {1, 2, 4, 8, 12, 24, 48};
 
@@ -54,7 +57,7 @@ public class FactoryReceiver extends BroadcastReceiver {
 
     private void handleBootCompleted(Context context) {
         try {
-            String rec = Tools.execCommand(new String[]{"sh", "-c", "ls /mnt/media_rw/"});
+            String rec = Tools.execCommand(new String[] {"sh", "-c", "ls /mnt/media_rw/"});
             Log.e(TAG, "rec=" + rec);
             if (rec == null || rec.isEmpty()) {
                 return;
@@ -99,14 +102,14 @@ public class FactoryReceiver extends BroadcastReceiver {
                 Log.e(TAG, "MainActivity.udisk_backup=" + MainActivity.udisk_backup);
                 if (i == 2) {
                     MainActivity.burn_efuse_flag = false;
-					Tools.exec("setbootenv ubootenv.var.factory_mcu_mac 1");
-                }else{
+                    Tools.exec("setbootenv ubootenv.var.factory_mcu_mac 1");
+                } else {
                     MainActivity.burn_efuse_flag = true;
-					Tools.exec("setbootenv ubootenv.var.factory_mcu_mac 0");
+                    Tools.exec("setbootenv ubootenv.var.factory_mcu_mac 0");
                 }
                 if (i == 1) {
                     try {
-                        String rec = Tools.execCommand(new String[]{"sh", "-c", "cat " + fullpath});
+                        String rec = Tools.execCommand(new String[] {"sh", "-c", "cat " + fullpath});
                         MainActivity.ageing_flag = 1;
                         setAgeingCpuMax(rec);
                         setAgeingTime(rec);
@@ -152,7 +155,7 @@ public class FactoryReceiver extends BroadcastReceiver {
             }
 
             try {
-                String rec = Tools.execCommand(new String[]{"sh", "-c", "cat " + fullpath});
+                String rec = Tools.execCommand(new String[] {"sh", "-c", "cat " + fullpath});
                 if (rec.contains("reboot_test=1")) {
                     context.startActivity(
                         new Intent(context, RebootTestActivity.class)
@@ -160,9 +163,11 @@ public class FactoryReceiver extends BroadcastReceiver {
                     );
                     return;
                 }
-                if(setTestBoard(rec)){
-                   setTestFlags(rec);
+                Log.e(TAG, "factorytest=[" + rec + "]");
+                if(setTestBoard(rec)) {
+                    setTestFlags(rec);
                 }
+                getCheckVersionInfo(fullpath);
                 startMainActivity(context);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -171,6 +176,7 @@ public class FactoryReceiver extends BroadcastReceiver {
     }
 
     private boolean setTestBoard(String rec) {
+        boolean ret = true;
         if (rec.contains("test_board=VIM1S")) {
             MainActivity.test_board = "VIM1S";
         } else if (rec.contains("test_board=VIM2")) {
@@ -183,7 +189,7 @@ public class FactoryReceiver extends BroadcastReceiver {
             MainActivity.test_board = "Edge2";
         } else {
             MainActivity.test_board = "VIM3";
-            setTestFlags(rec);
+
             MainActivity.tfcard_test = true;
             MainActivity.usb20_test = true;
             MainActivity.usb30_test = true;
@@ -207,9 +213,9 @@ public class FactoryReceiver extends BroadcastReceiver {
             MainActivity.tp_test = false;
             MainActivity.wirte_mac = true;
             MainActivity.reset_mcu = true;
-            return false;
+            ret = false;
         }
-        return true;
+        return ret;
     }
 
     private void setTestFlags(String rec) {
@@ -237,6 +243,73 @@ public class FactoryReceiver extends BroadcastReceiver {
         MainActivity.wirte_mac = rec.contains("wirte_mac=1");
         MainActivity.reset_mcu = rec.contains("reset_mcu=1");
     }
+
+    private void getCheckVersionInfo(String filePath) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                Log.e(TAG, "line:" + line);
+                if (line != null && !line.isEmpty()) {
+                    if (line.toLowerCase().contains("mcu_ver")) {
+                        MainActivity.check_mcu_ver = extractMcuVersion(line);
+                        Log.e(TAG, "Get mcu version:" + MainActivity.check_mcu_ver);
+                    } else if (line.toLowerCase().contains("fw_ver")) {
+                        MainActivity.check_fw_ver = extractFwVersion(line);
+                        Log.e(TAG, "Get fw version:" + MainActivity.check_fw_ver);
+                    }
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private String extractMcuVersion(String input) {
+        if (input == null || input.isEmpty()) {
+            return null;
+        }
+        Pattern pattern1 = Pattern.compile("TEST_MCU_VER\\s*=\\s*(\\S*)", Pattern.CASE_INSENSITIVE);
+        Matcher matcher1 = pattern1.matcher(input);
+
+        if (matcher1.find()) {
+            String value = matcher1.group(1).trim();
+            return value.isEmpty() ? "" : value;
+        }
+
+        Pattern pattern2 = Pattern.compile("mcu_ver\\s*=\\s*(\\S*)", Pattern.CASE_INSENSITIVE);
+        Matcher matcher2 = pattern2.matcher(input);
+
+        if (matcher2.find()) {
+            String value = matcher2.group(1).trim();
+            return value.isEmpty() ? "" : value;
+        }
+
+        return "";
+    }
+
+    private String extractFwVersion(String input) {
+        if (input == null || input.isEmpty()) {
+            return null;
+        }
+        Pattern pattern1 = Pattern.compile("TEST_FW_VER\\s*=\\s*(\\S*)", Pattern.CASE_INSENSITIVE);
+        Matcher matcher1 = pattern1.matcher(input);
+
+        if (matcher1.find()) {
+            String value = matcher1.group(1).trim();
+            return value.isEmpty() ? "" : value;
+        }
+
+        Pattern pattern2 = Pattern.compile("fw_ver\\s*=\\s*(\\S*)", Pattern.CASE_INSENSITIVE);
+        Matcher matcher2 = pattern2.matcher(input);
+
+        if (matcher2.find()) {
+            String value = matcher2.group(1).trim();
+            return value.isEmpty() ? "" : value;
+        }
+
+        return "";
+    }
+
 
     private void setAgeingTime(String rec) {
         Pattern pattern = Pattern.compile("ageing_time=(\\d+)");
