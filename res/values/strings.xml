@@ -100,7 +100,7 @@
     <string name="IRKeyTest">红外遥控测试</string>
     <string name="KeyTest">按键测试</string>
     <string name="EnableWol">打开WOL</string>
-    <string name="Restore_MCU_settings">复位MCU并截图测试结果到U盘中</string>
+    <string name="Restore_MCU_settings">复位MCU并保存测试结果到U盘中</string>
     <string name="DisableWol">关闭WOL</string>
     <string name="l1">L1</string>
     <string name="l2">L2</string>

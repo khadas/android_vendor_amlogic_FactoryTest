@@ -262,6 +262,8 @@ public class MainActivity extends Activity {
     private final int MSG_KEY_TEST_ERROR = 118;
     private final int MSG_KEY_TEST_OK = 119;
     private final int MSG_GET_CPU_STATUS = 120;
+    private final int MSG_AGEING_TEST_NOT_COMPLET =  121;
+
     private final int MSG_TIME = 777;
 
     private final int MSG_TEST_RET_UPDATE = 1000;
@@ -312,6 +314,7 @@ public class MainActivity extends Activity {
     public static int ageing_cpu_max = 0;
     private StatusBarManager mStatusBarManager;
     private AlertDialog verAlertDialog;
+    private static boolean isTestAllPass = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -438,9 +441,9 @@ public class MainActivity extends Activity {
             m_Button_Key.setVisibility(View.GONE);
         }
 
-        if (!ageing_test) {
-            m_TextView_AGEING.setVisibility(View.GONE);
-        }
+//        if (!ageing_test) {
+//            m_TextView_AGEING.setVisibility(View.GONE);
+//        }
 
         if (!key_test) {
             m_TextView_KEY.setVisibility(View.GONE);
@@ -513,6 +516,7 @@ public class MainActivity extends Activity {
                     } catch (Exception localException1) {
                     }
                 }
+
             }
         } .start();
 
@@ -618,7 +622,8 @@ public class MainActivity extends Activity {
                 (fusb302_test ? (fusb302_test & fusb302_test_ret) : true) &&
                 (wifi_test ? (wifi_test & wifi_test_ret) : true) &&
                 (bt_test ? (bt_test & bt_test_ret) : true) && (rtc_test ? (rtc_test & rtc_test_ret) : true) &&
-                (ageing_test ? (ageing_test & ageing_test_ret) : true) && (power_led_test ? (power_led_test & power_led_test_ret) : true) &&
+//                (ageing_test ? (ageing_test & ageing_test_ret) : true) && (power_led_test ? (power_led_test & power_led_test_ret) : true) &&
+                 ageing_test_ret && (power_led_test ? (power_led_test & power_led_test_ret) : true) &&
                 (irkey_test ? (irkey_test & irkey_test_ret) : true) &&
                 (mipi_camera_test ? (mipi_camera_test & mipi_camera_test_ret) : true) &&
                 (board_key_test ? (board_key_test & board_key_test_ret) : true) && (key_test ? (key_test & key_test_ret) : true) &&
@@ -639,6 +644,7 @@ public class MainActivity extends Activity {
             Bitmap bitmap = EncodingUtils.createQRCode(showBardCode, 500, 500, null);
             m_ImageView_infoBarCode.setImageBitmap(bitmap);
             m_ImageView_infoBarCode.setVisibility(View.VISIBLE);
+            isTestAllPass = true;
             Log.d(TAG, "showBardCode:" + showBardCode);
         }
     }
@@ -1053,6 +1059,60 @@ public class MainActivity extends Activity {
         startActivity(intent);
     }
 
+    private String getSaveContent() {
+        String info = "";
+        info +=  "MAC:" + getMac() + "\n";
+        info +=  "SN:" + getSn() + "\n";
+        info +=  "MCU:" + getMCUVersion() + "\n";
+        info +=  "FwVersion:" + Build.DISPLAY + "\n";
+        info +=  "MemSize:" + Tools.getMemSize() + "\n";
+        info +=  "FlashSize:" + Tools.getRomSize(this) + "\n";
+
+        info +=  "tfcard_test:"  + (tfcard_test == tfcard_test_ret) + "\n";
+        info +=  "usb20_test:"  + (usb20_test == usb20_test_ret) + "\n";
+        info +=  "usb30_test:"  + (usb30_test == usb30_test_ret) + "\n";
+        info +=  "gsensor_test:"  + (gsensor_test == gsensor_test_ret) + "\n";
+        info +=  "mcu_test:"  + (mcu_test == mcu_test_ret) + "\n";
+        info +=  "hdmi_test:"  + (hdmi_test == hdmi_test_ret) + "\n";
+        info +=  "fusb302_test:"  + (fusb302_test == fusb302_test_ret) + "\n";
+        info +=  "wifi_test:"  + (wifi_test == wifi_test_ret) + "\n";
+        info +=  "bt_test:"  + (bt_test == bt_test_ret) + "\n";
+        info +=  "rtc_test:"  + (rtc_test == rtc_test_ret) + "\n";
+        info +=  "ageing_test:"  + ageing_test_ret + "\n";
+        info +=  "power_led_test:"  + (power_led_test == power_led_test_ret) + "\n";
+        info +=  "irkey_test:"  + (irkey_test == irkey_test_ret) + "\n";
+        info +=  "mipi_camera_test:"  + (mipi_camera_test == mipi_camera_test_ret) + "\n";
+        info +=  "board_key_test:"  + (board_key_test == board_key_test_ret) + "\n";
+        info +=  "key_test:"  + (key_test == key_test_ret) + "\n";
+        info +=  "reset_mcu:"  + (reset_mcu == reset_mcu_ret) + "\n";
+        info +=  "mipi_lcd_test:"  + (mipi_lcd_test == mipi_lcd_test_ret) + "\n";
+        info +=  "tp_test:"  + (tp_test == tp_test_ret) + "\n";
+        info +=  "wirte_mac:"  + (wirte_mac == wirte_mac_ret) + "\n";
+        info +=  "\n\nisTestAllPass:"  + isTestAllPass + "\n";
+        return info;
+    }
+
+    private boolean saveToFile(String filename, String content) {
+        FileWriter fWriter = null;
+        try {
+            fWriter = new FileWriter(filename, false);
+            fWriter.write(content);
+            fWriter.flush();
+            Log.e(TAG, "filename: " + filename);
+            Log.e(TAG, "content: " + content);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (fWriter != null) {
+                try {
+                    fWriter.close();
+                } catch (Exception e) {
+                }
+            }
+        }
+        return true;
+    }
+
     public synchronized void rst_mcu(View view) {
         new Thread(new Runnable() {
             @Override
@@ -1064,31 +1124,34 @@ public class MainActivity extends Activity {
                 str_serial_number =  Build.getSerial();
                 Log.d(TAG, "str_serial_number : " + str_serial_number);
 
-                String path = MainActivity.udisk_backup + "/";
-                String cmd_val = "ls " + path;
-                Log.d(TAG, "cmd_val : " + cmd_val);
-                if(Tools.exec(cmd_val).contains("No such file or directory")) {
-                    cmd_val = "mkdir -p " + path;
-                    Tools.exec(cmd_val);
-                }
-                cmd_val = "screencap -p " + path + str_serial_number + ".png";
-                Log.d(TAG, "screencap cmd_val : " + cmd_val);
+                String fileName = MainActivity.udisk_backup + "/" + Build.MODEL + "_" + str_serial_number + "_" + (isTestAllPass ? "OK" : "KO");
 
-                String rec = "";
-                try {
-                    Tools.execCommand(new String[] {"sh", "-c", cmd_val});
-                    Tools.execCommand(new String[] {"sh", "-c", "sync"});
-                    Log.d(TAG, "screencap sync");
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                saveToFile(fileName, getSaveContent());
+
+//                String cmd_val = "ls " + path;
+//                Log.d(TAG, "cmd_val : " + cmd_val);
+//                if(Tools.exec(cmd_val).contains("No such file or directory")) {
+//                    cmd_val = "mkdir -p " + path;
+//                    Tools.exec(cmd_val);
+//                }
+//                cmd_val = "screencap -p " + path + str_serial_number + ".png";
+//                Log.d(TAG, "screencap cmd_val : " + cmd_val);
+
+//                String rec = "";
+//                try {
+//                    Tools.execCommand(new String[] {"sh", "-c", cmd_val});
+//                    Tools.execCommand(new String[] {"sh", "-c", "sync"});
+//                    Log.d(TAG, "screencap sync");
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        if(rec.contains("")) {
+//                        if(rec.contains("")) {
                             m_Button_Rst_MCU.setTextColor(Color.GREEN);
                             reset_mcu_ret = true;
-                        }
+//                        }
                     }
                 });
 
@@ -1189,18 +1252,20 @@ public class MainActivity extends Activity {
                 Log.d(TAG, "hlm AGEING: " + id);
                 if(1 == id) {
                     ageing_test_ok_flag = true;
-                    if (!ageing_test) {
-                        //m_TextView_AGEING.setVisibility(View.VISIBLE);
-                    }
                     mHandler.sendEmptyMessage(MSG_AGEING_TEST_OK);
                     return;
+                } else {
+                   ageing_test_ok_flag = false;
+                   if (ageing_test) {
+                       mHandler.sendEmptyMessage(MSG_AGEING_TEST_ERROR);
+                   } else {
+                       mHandler.sendEmptyMessage(MSG_AGEING_TEST_NOT_COMPLET);
+                   }
                 }
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
-        ageing_test_ok_flag = false;
-        mHandler.sendEmptyMessage(MSG_AGEING_TEST_ERROR);
     }
 
     private void test_Gigabit() {
@@ -1340,13 +1405,14 @@ public class MainActivity extends Activity {
             tmp[num] = tmp[num] + list[z];
         }
         for (int i = 0; i < tmp.length; i++) {
+            Log.d(TAG, "tmp[" + i +  "]" + tmp[i]);
             if (Build.MODEL.equals("VIM1") || Build.MODEL.equals("VIM2")) {
                 if ((tmp[i].indexOf("(O)") != -1) && (tmp[i].indexOf("Bus=01") != -1) && (tmp[i].indexOf("Port=02") != -1)) {
-                    Log.d("TAG", "USB2.0 port 1 is OK");
+                    Log.d(TAG, "USB2.0 port 1 is OK");
                     mHandler.sendEmptyMessage(MSG_USB1_TEST_XL_OK);
                 }
                 if ((tmp[i].indexOf("(O)") != -1) && (tmp[i].indexOf("Bus=01") != -1) && (tmp[i].indexOf("Port=03") != -1)) {
-                    Log.d("TAG", "USB2.0 port 2 is OK");
+                    Log.d(TAG, "USB2.0 port 2 is OK");
                     mHandler.sendEmptyMessage(MSG_USB2_TEST_XL_OK);
                 }
             } else {
@@ -1355,12 +1421,11 @@ public class MainActivity extends Activity {
                     mHandler.sendEmptyMessage(MSG_USB2_TEST_XL_OK);
                 }
                 if ((tmp[i].indexOf("(O)") != -1) && (tmp[i].indexOf("Bus=01") != -1)) {
-                    Log.d("TAG", "USB2.0 is OK");
+                    Log.d(TAG, "USB2.0 is OK");
                     mHandler.sendEmptyMessage(MSG_USB1_TEST_XL_OK);
                 }
             }
         }
-
     }
 
 
@@ -1675,6 +1740,15 @@ public class MainActivity extends Activity {
                 m_TextView_AGEING.setText(strTxt);
                 m_TextView_AGEING.setTextColor(0xFFFF5555);
                 Log.d(TAG, "MSG_AGEING_TEST_ERROR");
+            }
+            break;
+
+            case  MSG_AGEING_TEST_NOT_COMPLET: {
+                String strTxt = getResources().getString(R.string.AGEING_Test) + "    " + getResources().getString(R.string.Test_Fail);
+
+                m_TextView_AGEING.setText(strTxt);
+                m_TextView_AGEING.setTextColor(0xFFFF5555);
+                Log.d(TAG, "MSG_AGEING_TEST_NOT_COMPLET");
             }
             break;
 
