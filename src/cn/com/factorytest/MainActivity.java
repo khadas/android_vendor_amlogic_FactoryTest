@@ -555,6 +555,16 @@ public class MainActivity extends Activity {
         m_ImageView_infoBarCode.setVisibility(View.GONE);
     }
 
+    private void turnOnFan() {
+        try {
+            Tools.execCommand(new String[]{"sh", "-c", "echo 1 > /sys/class/fan/enable"});
+            Tools.execCommand(new String[]{"sh", "-c", "echo 0 > /sys/class/fan/mode"});
+            Tools.execCommand(new String[]{"sh", "-c", "echo 5 > /sys/class/fan/level"});
+        } catch (IOException e) {
+                e.printStackTrace();
+        }
+    }
+
     private void checkVersionInfo() {
         if ( (!TextUtils.isEmpty(check_mcu_ver) && !check_mcu_ver.equals(getMCUVersion())) ||
                 (!TextUtils.isEmpty(check_fw_ver) && !check_fw_ver.equals(Build.DISPLAY)) ) {
@@ -695,6 +705,9 @@ public class MainActivity extends Activity {
         test_SPI();
         if(wifi_test) {
             test_Wifi();
+        }
+        if (!ageing_test) {
+            turnOnFan();
         }
     }
 
