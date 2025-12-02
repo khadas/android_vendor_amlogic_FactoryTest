@@ -603,7 +603,7 @@ public class MainActivity extends Activity {
         Log.d("TESTINFO", "tfcard_test " + tfcard_test +  " tfcard_test_ret " +  tfcard_test_ret + " RET " + (tfcard_test ? (tfcard_test & tfcard_test_ret) : true));
         Log.d("TESTINFO", "usb20_test " + usb20_test +  " usb20_test_ret " +  usb20_test_ret + " RET " + (usb20_test ? (usb20_test & usb20_test_ret) : true));
         Log.d("TESTINFO", "usb30_test " + usb30_test +  " usb30_test_ret " +  usb30_test_ret + " RET " + (usb30_test ? (usb30_test & usb30_test_ret) : true));
-        //        Log.d("TESTINFO", "spi_test " + spi_test +  " spi_test_ret " +  spi_test_ret + " RET " + (spi_test ? (spi_test & spi_test_ret) : true));
+        Log.d("TESTINFO", "spi_test " + spi_test +  " spi_test_ret " +  spi_test_ret + " RET " + (spi_test ? (spi_test & spi_test_ret) : true));
         Log.d("TESTINFO", "gsensor_test " + gsensor_test +  " gsensor_test_ret " +  gsensor_test_ret + " RET " +  (gsensor_test ? (gsensor_test & gsensor_test_ret) : true));
         Log.d("TESTINFO", "mcu_test " + mcu_test +  " mcu_test_ret " +  mcu_test_ret + " RET " + (mcu_test ? (mcu_test & mcu_test_ret) : true));
         Log.d("TESTINFO", "hdmi_test " + hdmi_test +  " hdmi_test_ret " +  hdmi_test_ret + " RET " +  (hdmi_test ? (hdmi_test & hdmi_test_ret) : true));
@@ -626,7 +626,7 @@ public class MainActivity extends Activity {
 
         if((tfcard_test ? (tfcard_test & tfcard_test_ret) : true) && (usb20_test ? (usb20_test & usb20_test_ret) : true) &&
                 (usb30_test ? (usb30_test & usb30_test_ret) : true) &&
-                //                (spi_test ? (spi_test & spi_test_ret) : true) &&
+                (spi_test ? (spi_test & spi_test_ret) : true) &&
                 (gsensor_test ? (gsensor_test & gsensor_test_ret) : true) && (mcu_test ? (mcu_test & mcu_test_ret) : true) &&
                 (hdmi_test ? (hdmi_test & hdmi_test_ret) : true) &&
                 (fusb302_test ? (fusb302_test & fusb302_test_ret) : true) &&
